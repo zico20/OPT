@@ -1,0 +1,12 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g filter="url(#shadow)">
+    <path d="M150 220C150 140 210 100 256 100C302 100 362 140 362 220" stroke="#FF5F1F" stroke-width="35" stroke-linecap="round"/>
+    <path d="M190 270C190 230 225 210 256 210C287 210 322 230 322 270V310C322 350 287 380 256 380C225 380 190 350 190 310" stroke="#FF5F1F" stroke-width="30" stroke-linecap="round"/>
+    <path d="M256 270L280 320C280 320 256 345 256 345C256 345 232 320 232 320L256 270Z" fill="#FF3131"/>
+  </g>
+  <defs>
+    <filter id="shadow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+</svg>

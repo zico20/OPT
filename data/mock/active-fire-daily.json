@@ -1,0 +1,32 @@
+[
+  {
+    "fire_id": "firms_20260310_001",
+    "district_id": "manavgat",
+    "district_name": "Manavgat",
+    "lat": 36.78,
+    "lon": 31.47,
+    "source": "FIRMS",
+    "confidence": "high",
+    "detected_at": "2026-03-10T05:40:00+03:00"
+  },
+  {
+    "fire_id": "firms_20260310_002",
+    "district_id": "manavgat",
+    "district_name": "Manavgat",
+    "lat": 36.82,
+    "lon": 31.42,
+    "source": "FIRMS",
+    "confidence": "high",
+    "detected_at": "2026-03-10T06:20:00+03:00"
+  },
+  {
+    "fire_id": "firms_20260310_003",
+    "district_id": "alanya",
+    "district_name": "Alanya",
+    "lat": 36.56,
+    "lon": 32.03,
+    "source": "FIRMS",
+    "confidence": "nominal",
+    "detected_at": "2026-03-10T03:50:00+03:00"
+  }
+]

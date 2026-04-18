@@ -1,0 +1,64 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed areas
+        id: changes
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || git diff --name-only HEAD)
+          echo "$CHANGED"
+
+          if echo "$CHANGED" | grep -q "^apps/web/"; then
+            echo "web=true" >> $GITHUB_OUTPUT
+          else
+            echo "web=false" >> $GITHUB_OUTPUT
+          fi
+
+          if echo "$CHANGED" | grep -qE "^services/worker/|^\.env\.example"; then
+            echo "worker=true" >> $GITHUB_OUTPUT
+          else
+            echo "worker=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd /opt/fire-risk/current
+
+            echo "==> Pulling latest code..."
+            git pull origin main
+
+            DEPLOY_WEB="${{ steps.changes.outputs.web }}"
+            DEPLOY_WORKER="${{ steps.changes.outputs.worker }}"
+
+            if [[ "$DEPLOY_WORKER" == "true" ]]; then
+              echo "==> Restarting worker..."
+              sudo systemctl restart fire-risk-worker
+              echo "Worker restarted."
+            fi
+
+            if [[ "$DEPLOY_WEB" == "true" ]]; then
+              echo "==> Building web..."
+              ./scripts/prepare-production.sh
+              sudo systemctl restart fire-risk-web
+              echo "Web rebuilt and restarted."
+            fi
+
+            echo "==> Deploy complete."

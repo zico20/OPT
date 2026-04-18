@@ -1,0 +1,13 @@
+node_modules/
+.next/
+dist/
+coverage/
+.env
+.env.local
+.vercel/
+tmp/
+logs/
+data/runtime-cache/
+secrets/
+wildfire-540-c57338eb025e.json
+tmp_test.txt

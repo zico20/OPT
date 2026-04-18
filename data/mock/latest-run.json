@@ -1,0 +1,27 @@
+{
+  "run_id": "run_2026-03-10",
+  "run_date": "2026-03-10",
+  "status": "completed",
+  "selected_model": "RandomForest",
+  "selected_threshold": 0.6,
+  "label_source": "MCD64A1",
+  "label_status": "OK",
+  "started_at": "2026-03-10T08:12:54+03:00",
+  "finished_at": "2026-03-10T08:12:54+03:00",
+  "feature_window_days": 7,
+  "window_mode": "weekly",
+  "fire_f1": 0.87,
+  "fire_precision": 0.83,
+  "fire_recall": 0.9,
+  "balanced_accuracy": 0.9,
+  "critical_districts": 2,
+  "warning_districts": 3,
+  "active_fire_districts": 1,
+  "app_url": "https://code.earthengine.google.com/",
+  "download_urls": {
+    "risk_prob": "https://example.com/downloads/antalya_fire_risk_prob_2026-03-10.tif",
+    "risk_class": "https://example.com/downloads/antalya_fire_risk_class_2026-03-10.tif",
+    "risk_binary": "https://example.com/downloads/antalya_fire_risk_binary_2026-03-10.tif",
+    "run_report": "https://example.com/downloads/antalya_run_report_2026-03-10.csv"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@fire-risk/web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
+    "leaflet": "1.9.4",
+    "next": "^15.5.13",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-leaflet": "5.0.0"
+  }
+}

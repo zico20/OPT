@@ -1,0 +1,27 @@
+[Unit]
+Description=Fire Risk Worker API
+After=network.target
+
+[Service]
+Type=simple
+User=__SERVICE_USER__
+Group=__SERVICE_GROUP__
+WorkingDirectory=__REPO_ROOT__
+Environment=FIRE_RISK_REPO_ROOT=__REPO_ROOT__
+EnvironmentFile=-__REPO_ROOT__/.env
+ExecStart=__REPO_ROOT__/scripts/start-worker-prod.sh
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectControlGroups=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+RestrictSUIDSGID=true
+LockPersonality=true
+UMask=027
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

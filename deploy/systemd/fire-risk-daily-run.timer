@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Fire Risk Daily Export and Inference at 08:00
+
+[Timer]
+OnCalendar=*-*-* 12:00:00
+Persistent=true
+Unit=fire-risk-daily-run.service
+
+[Install]
+WantedBy=timers.target

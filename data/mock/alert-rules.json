@@ -1,0 +1,7 @@
+{
+  "probability_watch_min": 0.55,
+  "probability_warning_min": 0.7,
+  "high_or_very_high_area_pct_min": 10,
+  "hotspot_count_critical_min": 1,
+  "updated_at": "2026-03-09T23:51:35.785Z"
+}

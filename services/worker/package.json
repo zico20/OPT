@@ -1,0 +1,15 @@
+{
+    "name":  "@fire-risk/worker",
+    "private":  true,
+    "type":  "module",
+    "scripts":  {
+                    "start":  "node src/server.js",
+                    "run:daily":  "node src/runDaily.js",
+                    "test":  "node --test src/alertRules.test.js",
+                    "run:export":  "node src/exportDailyAssets.js"
+                },
+    "dependencies":  {
+                         "@supabase/supabase-js":  "^2.49.8",
+                         "@google/earthengine":  "^1.5.15"
+                     }
+}

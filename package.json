@@ -1,0 +1,19 @@
+{
+    "name":  "fire-risk-platform",
+    "private":  true,
+    "workspaces":  [
+                       "apps/web",
+                       "services/worker"
+                   ],
+    "scripts":  {
+                    "dev:web":  "npm run dev --workspace @fire-risk/web",
+                    "build:web":  "npm run build --workspace @fire-risk/web",
+                    "start:web":  "npm run start --workspace @fire-risk/web",
+                    "build:prod":  "npm run build:web",
+                    "start:worker":  "npm run start --workspace @fire-risk/worker",
+                    "run:worker":  "npm run run:daily --workspace @fire-risk/worker --",
+                    "test:worker":  "npm run test --workspace @fire-risk/worker",
+                    "seed:supabase":  "node scripts/seed-supabase.mjs",
+                    "run:export":  "npm run run:export --workspace @fire-risk/worker --"
+                }
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "subscriber_id": "sub_1773099708886",
+    "channel_type": "telegram",
+    "chat_id": "2094526594",
+    "district_scope": "all",
+    "enabled": true,
+    "created_at": "2026-03-09T23:41:48.886Z"
+  }
+]

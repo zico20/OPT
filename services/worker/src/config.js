@@ -1,0 +1,131 @@
+import { loadRootEnv } from "./loadEnv.js";
+
+loadRootEnv();
+
+function toNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function toBoolean(value, fallback = false) {
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+  return String(value).toLowerCase() === "true";
+}
+
+const DEFAULTS = {
+  timezone: process.env.WORKER_TIMEZONE || "Europe/Istanbul",
+  runHour: toNumber(process.env.WORKER_RUN_HOUR, 8),
+  useMockEarthEngine: process.env.WORKER_USE_MOCK_EE !== "false",
+  workerExportBeforeRun: toBoolean(process.env.WORKER_EXPORT_BEFORE_RUN, false),
+  publicAppUrl: process.env.APP_PUBLIC_URL || process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
+  telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || "",
+  telegramDefaultChatId: process.env.TELEGRAM_DEFAULT_CHAT_ID || "",
+  eeProjectId: process.env.EE_PROJECT_ID || "",
+  eeServiceAccountKeyPath: process.env.EE_SERVICE_ACCOUNT_KEY_PATH || "",
+  eeAssetRoot: process.env.EE_ASSET_ROOT || "",
+  eeAssetNamePrefix: process.env.EE_ASSET_NAME_PREFIX || "antalya_fire_risk",
+  eeClassifierAssetId: process.env.EE_CLASSIFIER_ASSET_ID || "",
+  eeClassifierFallbackAssetId: process.env.EE_CLASSIFIER_FALLBACK_ASSET_ID || "",
+  eeClassifierOutputMode: process.env.EE_CLASSIFIER_OUTPUT_MODE || "CLASSIFICATION",
+  eeRiskOutputStrategy: process.env.EE_RISK_OUTPUT_STRATEGY || "dynamic_training_only",
+  eeAllowDynamicTrainingFallback: toBoolean(process.env.EE_ALLOW_DYNAMIC_TRAINING_FALLBACK, true),
+  eeAllowHeuristicFallback: toBoolean(process.env.EE_ALLOW_HEURISTIC_FALLBACK, true),
+  eeLabelWindowDays: toNumber(process.env.EE_LABEL_WINDOW_DAYS, 365),
+  eeFireExpandPixels: toNumber(process.env.EE_FIRE_EXPAND_PIXELS, 1),
+  eeTrainSamplesPerClass: toNumber(process.env.EE_TRAIN_SAMPLES_PER_CLASS, 1200),
+  eeTrainNegToPosRatio: toNumber(process.env.EE_TRAIN_NEG_TO_POS_RATIO, 1),
+  eeTrainSeed: toNumber(process.env.EE_TRAIN_SEED, 42),
+  eeTrainMinSamplesPerClass: toNumber(process.env.EE_TRAIN_MIN_SAMPLES_PER_CLASS, 50),
+  eeFallbackRfTrees: toNumber(process.env.EE_FALLBACK_RF_TREES, 80),
+  eeAssetDatePolicy: process.env.EE_ASSET_DATE_POLICY || "exact",
+  eeMaxAssetAgeDays: toNumber(process.env.EE_MAX_ASSET_AGE_DAYS, 30),
+  eeRegionCountry: process.env.EE_REGION_COUNTRY || "Turkey",
+  eeRegionLevel1: process.env.EE_REGION_LEVEL1 || "Antalya",
+  eeSelectedModel: process.env.EE_SELECTED_MODEL || "RandomForest",
+  eeSelectedThreshold: toNumber(process.env.EE_SELECTED_THRESHOLD, 0.5),
+  eeWindowMode: process.env.EE_WINDOW_MODE || "weekly",
+  eeFeatureWindowDays: toNumber(process.env.EE_FEATURE_WINDOW_DAYS, 7),
+  eeCustomWindowDays: toNumber(process.env.EE_CUSTOM_WINDOW_DAYS, 30),
+  eeCloudThreshold: toNumber(process.env.EE_CLOUD_THRESHOLD, 20),
+  eeScale: toNumber(process.env.EE_SCALE, 1000),
+  eeCorridorLookbackYears: toNumber(process.env.EE_CORRIDOR_LOOKBACK_YEARS, 5),
+  eeMaxDistanceMeters: toNumber(process.env.EE_MAX_DISTANCE_METERS, 50000),
+  eeUseRoadDistance: toBoolean(process.env.EE_USE_ROAD_DISTANCE, false),
+  eeRoadsAssetPath: process.env.EE_ROADS_ASSET_PATH || "",
+  eeClassBreak1: toNumber(process.env.EE_CLASS_BREAK1, 0.2),
+  eeClassBreak2: toNumber(process.env.EE_CLASS_BREAK2, 0.4),
+  eeClassBreak3: toNumber(process.env.EE_CLASS_BREAK3, 0.6),
+  eeClassBreak4: toNumber(process.env.EE_CLASS_BREAK4, 0.8),
+  eeExportOverwrite: toBoolean(process.env.EE_EXPORT_OVERWRITE, false),
+  eeExportPollSeconds: toNumber(process.env.EE_EXPORT_POLL_SECONDS, 30),
+  eeExportTimeoutMinutes: toNumber(process.env.EE_EXPORT_TIMEOUT_MINUTES, 180),
+  eeApprovedFireF1: toNumber(process.env.EE_APPROVED_FIRE_F1, 0),
+  eeApprovedBalancedAccuracy: toNumber(process.env.EE_APPROVED_BALANCED_ACCURACY, 0),
+  eeDownloadBaseUrl: process.env.EE_DOWNLOAD_BASE_URL || "",
+  firmsEnabled: toBoolean(process.env.FIRMS_ENABLED, true),
+  firmsMapKey: process.env.FIRMS_MAP_KEY || "",
+  firmsBbox: process.env.FIRMS_BBOX || "29.3,36.0,32.5,37.5",
+  firmsDays: toNumber(process.env.FIRMS_DAYS, 1),
+  firmsSatellite: process.env.FIRMS_SATELLITE || "VIIRS_SNPP_NRT"
+};
+
+export function getConfig() {
+  return {
+    timezone: DEFAULTS.timezone,
+    runHour: DEFAULTS.runHour,
+    useMockEarthEngine: DEFAULTS.useMockEarthEngine,
+    workerExportBeforeRun: DEFAULTS.workerExportBeforeRun,
+    publicAppUrl: DEFAULTS.publicAppUrl,
+    telegramBotToken: DEFAULTS.telegramBotToken,
+    telegramDefaultChatId: DEFAULTS.telegramDefaultChatId,
+    eeProjectId: DEFAULTS.eeProjectId,
+    eeServiceAccountKeyPath: DEFAULTS.eeServiceAccountKeyPath,
+    eeAssetRoot: DEFAULTS.eeAssetRoot,
+    eeAssetNamePrefix: DEFAULTS.eeAssetNamePrefix,
+    eeClassifierAssetId: DEFAULTS.eeClassifierAssetId,
+    eeClassifierFallbackAssetId: DEFAULTS.eeClassifierFallbackAssetId,
+    eeClassifierOutputMode: DEFAULTS.eeClassifierOutputMode,
+    eeRiskOutputStrategy: DEFAULTS.eeRiskOutputStrategy,
+    eeAllowDynamicTrainingFallback: DEFAULTS.eeAllowDynamicTrainingFallback,
+    eeAllowHeuristicFallback: DEFAULTS.eeAllowHeuristicFallback,
+    eeLabelWindowDays: DEFAULTS.eeLabelWindowDays,
+    eeFireExpandPixels: DEFAULTS.eeFireExpandPixels,
+    eeTrainSamplesPerClass: DEFAULTS.eeTrainSamplesPerClass,
+    eeTrainNegToPosRatio: DEFAULTS.eeTrainNegToPosRatio,
+    eeTrainSeed: DEFAULTS.eeTrainSeed,
+    eeTrainMinSamplesPerClass: DEFAULTS.eeTrainMinSamplesPerClass,
+    eeFallbackRfTrees: DEFAULTS.eeFallbackRfTrees,
+    eeAssetDatePolicy: DEFAULTS.eeAssetDatePolicy,
+    eeMaxAssetAgeDays: DEFAULTS.eeMaxAssetAgeDays,
+    eeRegionCountry: DEFAULTS.eeRegionCountry,
+    eeRegionLevel1: DEFAULTS.eeRegionLevel1,
+    eeSelectedModel: DEFAULTS.eeSelectedModel,
+    eeSelectedThreshold: DEFAULTS.eeSelectedThreshold,
+    eeWindowMode: DEFAULTS.eeWindowMode,
+    eeFeatureWindowDays: DEFAULTS.eeFeatureWindowDays,
+    eeCustomWindowDays: DEFAULTS.eeCustomWindowDays,
+    eeCloudThreshold: DEFAULTS.eeCloudThreshold,
+    eeScale: DEFAULTS.eeScale,
+    eeCorridorLookbackYears: DEFAULTS.eeCorridorLookbackYears,
+    eeMaxDistanceMeters: DEFAULTS.eeMaxDistanceMeters,
+    eeUseRoadDistance: DEFAULTS.eeUseRoadDistance,
+    eeRoadsAssetPath: DEFAULTS.eeRoadsAssetPath,
+    eeClassBreak1: DEFAULTS.eeClassBreak1,
+    eeClassBreak2: DEFAULTS.eeClassBreak2,
+    eeClassBreak3: DEFAULTS.eeClassBreak3,
+    eeClassBreak4: DEFAULTS.eeClassBreak4,
+    eeExportOverwrite: DEFAULTS.eeExportOverwrite,
+    eeExportPollSeconds: DEFAULTS.eeExportPollSeconds,
+    eeExportTimeoutMinutes: DEFAULTS.eeExportTimeoutMinutes,
+    eeApprovedFireF1: DEFAULTS.eeApprovedFireF1,
+    eeApprovedBalancedAccuracy: DEFAULTS.eeApprovedBalancedAccuracy,
+    eeDownloadBaseUrl: DEFAULTS.eeDownloadBaseUrl,
+    firmsEnabled: DEFAULTS.firmsEnabled,
+    firmsMapKey: DEFAULTS.firmsMapKey,
+    firmsBbox: DEFAULTS.firmsBbox,
+    firmsDays: DEFAULTS.firmsDays,
+    firmsSatellite: DEFAULTS.firmsSatellite
+  };
+}

@@ -1,0 +1,29 @@
+{
+  "region_name": "Antalya, Turkey",
+  "timezone": "Europe/Istanbul",
+  "refresh_cadence": "Daily at 08:00",
+  "gee_app_url": "https://code.earthengine.google.com/",
+  "download_base_url": "https://example.com/downloads",
+  "legend": [
+    {
+      "class": "Very Low",
+      "color": "#4575b4"
+    },
+    {
+      "class": "Low",
+      "color": "#91bfdb"
+    },
+    {
+      "class": "Medium",
+      "color": "#ffffbf"
+    },
+    {
+      "class": "High",
+      "color": "#fdae61"
+    },
+    {
+      "class": "Very High",
+      "color": "#d73027"
+    }
+  ]
+}
