@@ -3,6 +3,7 @@ import LocaleSwitch from "../../../../components/LocaleSwitch";
 import StickyMissionStrip from "../../../../components/StickyMissionStrip";
 import MissionStatus from "../../../../components/MissionStatus";
 import TelegramSubscribePanel from "../../../../components/TelegramSubscribePanel";
+import DistrictHistoryChart from "../../../../components/DistrictHistoryChart";
 import { getAlertEvents, getDistrictById, getDistrictHistory } from "../../../../lib/data";
 import { formatPercent, formatProb, riskBadgeTone } from "../../../../lib/format";
 import { getMessages, localizeRiskClass, localizeSeverity, normalizeLocale } from "../../../../lib/i18n";
@@ -97,6 +98,7 @@ export default async function DistrictPage({ params }) {
       <section className="split split-feed" style={{ marginTop: 18 }}>
         <article className="panel district-table ops-table-panel">
           <h3>{messages.district.history}</h3>
+          <DistrictHistoryChart history={history} />
           <div className="ops-table-wrap">
             <table className="ops-table ops-mobile-feed">
               <thead>

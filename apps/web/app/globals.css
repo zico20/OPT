@@ -2132,6 +2132,73 @@ form,
   color: var(--accent);
 }
 
+.last-updated-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  background: rgba(34, 197, 94, 0.06);
+  color: var(--forest);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.last-updated-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--forest);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.75); }
+}
+
+/* ─── HISTORY CHART ──────────────────────────────────────────────────── */
+
+.history-chart-wrap {
+  margin-bottom: 16px;
+}
+
+.history-chart {
+  display: block;
+  width: 100%;
+  height: 100px;
+  border-radius: 8px;
+  background: var(--bg);
+  overflow: visible;
+}
+
+.history-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.history-chart-legend-line {
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.history-chart-legend-threshold {
+  display: inline-block;
+  width: 16px;
+  height: 2px;
+  background: var(--danger);
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
 /* ─── MISSION STATUS ─────────────────────────────────────────────────── */
 
 .mission-status {

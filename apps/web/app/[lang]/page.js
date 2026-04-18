@@ -6,6 +6,7 @@ import MissionStatus from "../../components/MissionStatus";
 import RiskMapShell from "../../components/RiskMapShell";
 import TelegramSubscribePanel from "../../components/TelegramSubscribePanel";
 import InsightCarousel from "../../components/InsightCarousel";
+import LastUpdatedBadge from "../../components/LastUpdatedBadge";
 import {
   getActiveFireDaily,
   getAlertEvents,
@@ -114,6 +115,7 @@ export default async function DashboardPage({ params }) {
               <span className="signal-pill"><MicroIcon name="calendar" /><span>{messages.home.lastRun}: {runDate}</span></span>
               <span className="signal-pill"><MicroIcon name="flame" /><span>{messages.home.hotspots}: {activeFireDistricts}</span></span>
               <span className="signal-pill"><MicroIcon name="alert" /><span>{messages.home.criticalDistricts}: {criticalDistricts}</span></span>
+              <LastUpdatedBadge timestamp={latestRun?.finished_at || latestRun?.started_at} />
             </div>
 
             <MissionStatus messages={messages} state={missionState} focusLabel={focusLabel} compact />
