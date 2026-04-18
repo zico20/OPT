@@ -7,6 +7,7 @@ import RiskMapShell from "../../components/RiskMapShell";
 import TelegramSubscribePanel from "../../components/TelegramSubscribePanel";
 import InsightCarousel from "../../components/InsightCarousel";
 import LastUpdatedBadge from "../../components/LastUpdatedBadge";
+import PushSubscribeButton from "../../components/PushSubscribeButton";
 import {
   getActiveFireDaily,
   getAlertEvents,
@@ -99,6 +100,7 @@ export default async function DashboardPage({ params }) {
                 buttonOnly
                 compact
               />
+              <PushSubscribeButton />
             </div>
           </div>
 

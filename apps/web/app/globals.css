@@ -473,6 +473,50 @@ button.secondary:hover {
   z-index: 2100;
 }
 
+/* ─── PUSH SUBSCRIBE BUTTON ──────────────────────────────────────────── */
+
+.push-subscribe-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  color: var(--muted-strong);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.push-subscribe-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.push-subscribe-btn.push-active {
+  border-color: rgba(34, 197, 94, 0.3);
+  background: rgba(34, 197, 94, 0.08);
+  color: var(--forest);
+}
+
+.push-subscribe-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.push-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ─── CONFIDENCE BADGE ───────────────────────────────────────────────── */
+
+.confidence-high   { color: var(--danger); font-weight: 700; }
+.confidence-nominal { color: var(--sand); font-weight: 600; }
+.confidence-low    { color: var(--muted); }
+
 .hero-topbar .locale-trigger {
   min-width: 56px;
   min-height: 40px;

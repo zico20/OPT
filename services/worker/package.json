@@ -10,6 +10,7 @@
                 },
     "dependencies":  {
                          "@supabase/supabase-js":  "^2.49.8",
-                         "@google/earthengine":  "^1.5.15"
+                         "@google/earthengine":  "^1.5.15",
+                         "web-push":  "^3.6.7"
                      }
 }

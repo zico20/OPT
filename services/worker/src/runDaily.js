@@ -4,6 +4,7 @@ import { sendTelegramMessage } from "./telegram.js";
 import { runOperationalInference, exportOperationalAssets } from "./earthEngine.js";
 import { fetchFirmsHotspots } from "./firms.js";
 import { readCollection, writeCollection, replaceLatestRun } from "./dataStore.js";
+import { sendWebPushNotifications } from "./pushNotify.js";
 
 function parseBooleanFlag(value) {
   if (value === undefined || value === null || value === "") {
@@ -173,11 +174,56 @@ export async function runDaily({ date, exportFirst } = {}) {
     active_fire_districts: activeFireDistricts
   };
 
+  const fortyEightHoursAgo = new Date(Date.now() - 48 * 3600 * 1000).toISOString();
+  const previousAlerts = await readCollection("alertEvents");
+  const recentlyAlertedDistrictIds = new Set(
+    previousAlerts
+      .filter((a) => a.sent_at >= fortyEightHoursAgo && ["Warning", "Critical"].includes(a.severity))
+      .map((a) => a.district_id)
+  );
+
   const alertEvents = await buildAlertEvents({
     run,
     districtRiskDaily,
     config
   });
+
+  const crisisEndedDistricts = districtRiskDaily.filter((d) => {
+    const wasAlerted = recentlyAlertedDistrictIds.has(d.district_id);
+    const nowSafe = !shouldSendAlert(d, alertRules);
+    return wasAlerted && nowSafe;
+  });
+
+  for (const district of crisisEndedDistricts) {
+    const message =
+      `\u2705 All Clear — ${district.district_name}\n` +
+      `\ud83d\udcc5 Date: ${run.run_date}\n` +
+      `Fire risk has dropped below alert threshold.\n` +
+      `Dashboard: ${config.publicAppUrl}`;
+
+    if (config.telegramBotToken && config.telegramDefaultChatId) {
+      await sendTelegramMessage({
+        botToken: config.telegramBotToken,
+        chatId: config.telegramDefaultChatId,
+        message
+      }).catch((err) => console.error("[crisis-ended] Telegram failed:", err.message));
+    }
+
+    await sendWebPushNotifications({
+      title: `\u2705 All Clear — ${district.district_name}`,
+      body: "Fire risk has dropped below the alert threshold.",
+      url: `${config.publicAppUrl}/districts/${district.district_id}`
+    }).catch((err) => console.error("[crisis-ended] Push failed:", err.message));
+  }
+
+  if (alertEvents.length > 0) {
+    const topAlert = alertEvents[0];
+    await sendWebPushNotifications({
+      title: `\ud83d\udd25 Fire Alert — ${topAlert.severity}: ${topAlert.district_name}`,
+      body: topAlert.trigger_reason,
+      url: `${config.publicAppUrl}/districts/${topAlert.district_id}`
+    }).catch((err) => console.error("[push] Alert push failed:", err.message));
+  }
 
   await replaceLatestRun(run);
   await writeCollection("districtRiskDaily", districtRiskDaily);
@@ -189,6 +235,7 @@ export async function runDaily({ date, exportFirst } = {}) {
     districtCount: districtRiskDaily.length,
     activeFireCount: activeFireDaily.length,
     alertCount: alertEvents.length,
+    crisisEndedCount: crisisEndedDistricts.length,
     exportFirst: shouldExportFirst,
     exportSummary
   };
