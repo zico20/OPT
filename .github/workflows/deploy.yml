@@ -31,34 +31,40 @@ jobs:
             echo "worker=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Setup SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script_stop: true
-          script: |
-            set -e
-            cd /opt/fire-risk/current
+        env:
+          DEPLOY_WEB: ${{ steps.changes.outputs.web }}
+          DEPLOY_WORKER: ${{ steps.changes.outputs.worker }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} bash << 'ENDSSH'
+          set -e
+          cd /opt/fire-risk/current
 
-            echo "==> Pulling latest code..."
-            git pull origin main
+          echo "==> Pulling latest code..."
+          git pull origin main
 
-            DEPLOY_WEB="${{ steps.changes.outputs.web }}"
-            DEPLOY_WORKER="${{ steps.changes.outputs.worker }}"
+          if [[ "$DEPLOY_WORKER" == "true" ]]; then
+            echo "==> Restarting worker..."
+            sudo systemctl restart fire-risk-worker
+            echo "Worker restarted."
+          fi
 
-            if [[ "$DEPLOY_WORKER" == "true" ]]; then
-              echo "==> Restarting worker..."
-              sudo systemctl restart fire-risk-worker
-              echo "Worker restarted."
-            fi
+          if [[ "$DEPLOY_WEB" == "true" ]]; then
+            echo "==> Building web..."
+            ./scripts/prepare-production.sh
+            sudo systemctl restart fire-risk-web
+            echo "Web rebuilt and restarted."
+          fi
 
-            if [[ "$DEPLOY_WEB" == "true" ]]; then
-              echo "==> Building web..."
-              ./scripts/prepare-production.sh
-              sudo systemctl restart fire-risk-web
-              echo "Web rebuilt and restarted."
-            fi
-
-            echo "==> Deploy complete."
+          echo "==> Deploy complete."
+          ENDSSH
