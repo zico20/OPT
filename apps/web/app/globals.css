@@ -517,6 +517,80 @@ button.secondary:hover {
 .confidence-nominal { color: var(--sand); font-weight: 600; }
 .confidence-low    { color: var(--muted); }
 
+/* ─── WEATHER STRIP ──────────────────────────────────────────────────── */
+
+.weather-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.weather-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  font-size: 0.8rem;
+  color: var(--muted-strong);
+  font-weight: 500;
+}
+
+.weather-chip-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.weather-chip.weather-risk-up.danger {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.weather-chip.weather-risk-up.warn {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--sand);
+  font-weight: 600;
+}
+
+.weather-chip.weather-risk-down {
+  border-color: rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.06);
+  color: var(--forest);
+}
+
+/* ─── FORECAST COLUMN ────────────────────────────────────────────────── */
+
+.ops-forecast-col { font-size: 0.8rem; }
+.forecast-up   { color: var(--danger); font-weight: 700; }
+.forecast-down { color: var(--forest); font-weight: 600; }
+.forecast-flat { color: var(--muted-strong); }
+
+/* ─── EFFIS TOGGLE ───────────────────────────────────────────────────── */
+
+.map-effis-toggle {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  color: var(--muted-strong);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.map-effis-toggle:hover,
+.map-effis-toggle.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
 .hero-topbar .locale-trigger {
   min-width: 56px;
   min-height: 40px;

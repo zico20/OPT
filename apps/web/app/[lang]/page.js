@@ -8,12 +8,14 @@ import TelegramSubscribePanel from "../../components/TelegramSubscribePanel";
 import InsightCarousel from "../../components/InsightCarousel";
 import LastUpdatedBadge from "../../components/LastUpdatedBadge";
 import PushSubscribeButton from "../../components/PushSubscribeButton";
+import WeatherStrip from "../../components/WeatherStrip";
 import {
   getActiveFireDaily,
   getAlertEvents,
   getAlertRules,
   getDistrictRiskDaily,
   getLatestRun,
+  getWeatherData,
   deriveOperationalSeverity,
   sortDistrictsForOperations
 } from "../../lib/data";
@@ -27,12 +29,13 @@ export default async function DashboardPage({ params }) {
   const locale = normalizeLocale(resolvedParams.lang);
   const messages = getMessages(locale);
 
-  const [latestRun, districtRows, fires, alerts, rules] = await Promise.all([
+  const [latestRun, districtRows, fires, alerts, rules, weather] = await Promise.all([
     getLatestRun(),
     getDistrictRiskDaily(),
     getActiveFireDaily(),
     getAlertEvents(),
-    getAlertRules()
+    getAlertRules(),
+    getWeatherData()
   ]);
 
   const districts = sortDistrictsForOperations(districtRows, rules).map((district) => ({
@@ -113,6 +116,7 @@ export default async function DashboardPage({ params }) {
             <h1>{messages.appName}</h1>
             <p>{messages.home.intro}</p>
 
+            <WeatherStrip weather={weather} />
             <div className="hero-signal-row">
               <span className="signal-pill"><MicroIcon name="calendar" /><span>{messages.home.lastRun}: {runDate}</span></span>
               <span className="signal-pill"><MicroIcon name="flame" /><span>{messages.home.hotspots}: {activeFireDistricts}</span></span>
@@ -259,6 +263,7 @@ export default async function DashboardPage({ params }) {
                   <th>{messages.home.highArea}</th>
                   <th>{messages.home.maxProb}</th>
                   <th>{messages.home.hotspots}</th>
+                  {weather?.tomorrow?.date && <th className="ops-forecast-col">Tomorrow</th>}
                 </tr>
               </thead>
               <tbody>
@@ -287,6 +292,21 @@ export default async function DashboardPage({ params }) {
                     <td className="ops-number" data-label={messages.home.highArea}>{formatPercent(district.high_or_very_high_area_pct, locale)}</td>
                     <td className="ops-number" data-label={messages.home.maxProb}>{formatProb(district.max_fire_prob, locale)}</td>
                     <td className="ops-number" data-label={messages.home.hotspots}>{district.hotspot_count_24h}</td>
+                    {weather?.tomorrow?.date && (
+                      <td className="ops-number ops-forecast-col" data-label="Tomorrow">
+                        {district.forecast_max_fire_prob != null ? (
+                          <span className={
+                            district.forecast_max_fire_prob > district.max_fire_prob + 0.05 ? "forecast-up" :
+                            district.forecast_max_fire_prob < district.max_fire_prob - 0.05 ? "forecast-down" :
+                            "forecast-flat"
+                          }>
+                            {formatProb(district.forecast_max_fire_prob, locale)}
+                            {district.forecast_max_fire_prob > district.max_fire_prob + 0.05 ? " ↑" :
+                             district.forecast_max_fire_prob < district.max_fire_prob - 0.05 ? " ↓" : ""}
+                          </span>
+                        ) : "-"}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

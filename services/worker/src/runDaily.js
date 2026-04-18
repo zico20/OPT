@@ -3,6 +3,7 @@ import { shouldSendAlert, buildTelegramMessage } from "./alertRules.js";
 import { sendTelegramMessage } from "./telegram.js";
 import { runOperationalInference, exportOperationalAssets } from "./earthEngine.js";
 import { fetchFirmsHotspots } from "./firms.js";
+import { fetchRegionWeather } from "./weather.js";
 import { readCollection, writeCollection, replaceLatestRun } from "./dataStore.js";
 import { sendWebPushNotifications } from "./pushNotify.js";
 
@@ -156,9 +157,30 @@ export async function runDaily({ date, exportFirst } = {}) {
     hotspotByDistrict.set(fire.district_id, (hotspotByDistrict.get(fire.district_id) || 0) + 1);
   }
 
+  let weatherData = null;
+  if (!config.useMockEarthEngine && config.owmEnabled && config.owmApiKey) {
+    try {
+      weatherData = await fetchRegionWeather({
+        lat: config.owmLat,
+        lon: config.owmLon,
+        apiKey: config.owmApiKey
+      });
+      await writeCollection("weatherData", weatherData);
+    } catch (err) {
+      console.error("[weather] Fetch failed:", err.message);
+    }
+  }
+
+  const forecastModifier = weatherData?.tomorrow?.risk_modifier ?? 1.0;
+  const forecastDate = weatherData?.tomorrow?.date ?? null;
+
   const districtRiskDaily = inference.districtRiskDaily.map((d) => ({
     ...d,
-    hotspot_count_24h: hotspotByDistrict.get(d.district_id) || 0
+    hotspot_count_24h: hotspotByDistrict.get(d.district_id) || 0,
+    forecast_max_fire_prob: forecastDate
+      ? Math.round(Math.min(0.99, Number(d.max_fire_prob || 0) * forecastModifier) * 1000) / 1000
+      : null,
+    forecast_date: forecastDate
   }));
 
   const alertRules = await readCollection("alertRules");

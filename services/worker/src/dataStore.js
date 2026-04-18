@@ -13,7 +13,8 @@ const FILES = {
   alertEvents: "alert-events.json",
   subscribers: "subscribers.json",
   alertRules: "alert-rules.json",
-  mapConfig: "map-config.json"
+  mapConfig: "map-config.json",
+  weatherData: "weather-data.json"
 };
 
 const DEFAULT_ALERT_RULES = {

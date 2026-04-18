@@ -1,6 +1,7 @@
 ﻿"use client";
 
-import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
+import { useState } from "react";
+import { CircleMarker, MapContainer, Popup, TileLayer, WMSTileLayer } from "react-leaflet";
 import { formatPercent, formatProb, riskBadgeTone, severityColor } from "../lib/format";
 import { localizeRiskClass } from "../lib/i18n";
 
@@ -26,6 +27,8 @@ function t(messages, key, fallback) {
 }
 
 export default function RiskMapClient({ districts, fires, messages, locale = "en", missionState = "monitoring" }) {
+  const [showEffis, setShowEffis] = useState(false);
+
   const legendRows = [
     { label: localizeRiskClass("Very High", locale), color: riskColor("Very High") },
     { label: localizeRiskClass("High", locale), color: riskColor("High") },
@@ -41,6 +44,16 @@ export default function RiskMapClient({ districts, fires, messages, locale = "en
           attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        {showEffis && (
+          <WMSTileLayer
+            url="https://maps.wild-fire.eu/effis"
+            layers="modis.ba.2024,modis.ba.2023"
+            format="image/png"
+            transparent={true}
+            opacity={0.65}
+            attribution="© EFFIS / JRC"
+          />
+        )}
         {districts.map((district) => (
           <CircleMarker
             key={district.district_id}
@@ -127,6 +140,13 @@ export default function RiskMapClient({ districts, fires, messages, locale = "en
         <div className="map-chip secondary">
           {t(messages, "districtRisk", "District risk")}
         </div>
+        <button
+          className={["map-chip", "map-effis-toggle", showEffis ? "active" : ""].filter(Boolean).join(" ")}
+          onClick={() => setShowEffis((v) => !v)}
+          title="Toggle EFFIS historical burned areas (2023–2024)"
+        >
+          🔥 {showEffis ? "Hide fire scars" : "Show fire scars"}
+        </button>
       </div>
 
       <aside className="map-legend-card">

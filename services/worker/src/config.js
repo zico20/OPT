@@ -68,7 +68,11 @@ const DEFAULTS = {
   firmsMapKey: process.env.FIRMS_MAP_KEY || "",
   firmsBbox: process.env.FIRMS_BBOX || "29.3,36.0,32.5,37.5",
   firmsDays: toNumber(process.env.FIRMS_DAYS, 1),
-  firmsSatellite: process.env.FIRMS_SATELLITE || "VIIRS_SNPP_NRT"
+  firmsSatellite: process.env.FIRMS_SATELLITE || "VIIRS_SNPP_NRT",
+  owmApiKey: process.env.OWM_API_KEY || "",
+  owmLat: toNumber(process.env.OWM_LAT, 36.8969),
+  owmLon: toNumber(process.env.OWM_LON, 30.7133),
+  owmEnabled: toBoolean(process.env.OWM_ENABLED, true)
 };
 
 export function getConfig() {
@@ -126,6 +130,10 @@ export function getConfig() {
     firmsMapKey: DEFAULTS.firmsMapKey,
     firmsBbox: DEFAULTS.firmsBbox,
     firmsDays: DEFAULTS.firmsDays,
-    firmsSatellite: DEFAULTS.firmsSatellite
+    firmsSatellite: DEFAULTS.firmsSatellite,
+    owmApiKey: DEFAULTS.owmApiKey,
+    owmLat: DEFAULTS.owmLat,
+    owmLon: DEFAULTS.owmLon,
+    owmEnabled: DEFAULTS.owmEnabled
   };
 }

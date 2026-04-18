@@ -13,7 +13,8 @@ const FILES = {
   alertEvents: "alert-events.json",
   subscribers: "subscribers.json",
   alertRules: "alert-rules.json",
-  mapConfig: "map-config.json"
+  mapConfig: "map-config.json",
+  weatherData: "weather-data.json"
 };
 
 const DEFAULT_ALERT_RULES = {
@@ -776,4 +777,12 @@ export function sortDistrictsForOperations(districts, rules = DEFAULT_ALERT_RULE
 
     return String(a.district_name || "").localeCompare(String(b.district_name || ""));
   });
+}
+
+export async function getWeatherData() {
+  try {
+    return await readLocalFallbackJson(FILES.weatherData, null);
+  } catch {
+    return null;
+  }
 }
