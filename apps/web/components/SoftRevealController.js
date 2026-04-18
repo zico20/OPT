@@ -12,7 +12,12 @@ const SELECTOR = [
   ".ops-event-card",
   ".ops-mobile-feed tbody tr",
   ".subscribe-card",
-  ".mission-strip"
+  ".mission-strip",
+  ".weather-strip",
+  ".hero-signal-row",
+  ".snapshot-tile",
+  ".story-stage-card",
+  ".feature-item"
 ].join(",");
 
 export default function SoftRevealController() {
