@@ -29,60 +29,78 @@ function calcRiskModifier({ tempC, humidity, windKmh }) {
   return Math.min(2.0, Math.max(0.5, Math.round(modifier * 100) / 100));
 }
 
-export async function fetchRegionWeather({ lat, lon, apiKey }) {
-  if (!apiKey) throw new Error("OWM_API_KEY is not set.");
+export async function fetchRegionWeather({ lat, lon }) {
+  // Open-Meteo: free, no API key required
+  const url =
+    `https://api.open-meteo.com/v1/forecast` +
+    `?latitude=${lat}&longitude=${lon}` +
+    `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code` +
+    `&daily=temperature_2m_max,relative_humidity_2m_min,wind_speed_10m_max,weather_code` +
+    `&timezone=auto&forecast_days=2`;
 
-  const base = "https://api.openweathermap.org/data/2.5";
-  const params = `lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+  const response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
+  if (!response.ok) {
+    throw new Error(`Open-Meteo: ${response.status} ${response.statusText}`);
+  }
 
-  const [currentRes, forecastRes] = await Promise.all([
-    fetch(`${base}/weather?${params}`, { signal: AbortSignal.timeout(15_000) }),
-    fetch(`${base}/forecast?${params}&cnt=16`, { signal: AbortSignal.timeout(15_000) })
-  ]);
+  const data = await response.json();
+  const curr = data.current || {};
+  const daily = data.daily || {};
 
-  if (!currentRes.ok) throw new Error(`OWM current: ${currentRes.status} ${currentRes.statusText}`);
-  if (!forecastRes.ok) throw new Error(`OWM forecast: ${forecastRes.status} ${forecastRes.statusText}`);
+  const windKmh = curr.wind_speed_10m ?? 0;
+  const humidity = curr.relative_humidity_2m ?? 50;
+  const temp = curr.temperature_2m ?? 25;
 
-  const [curr, fc] = await Promise.all([currentRes.json(), forecastRes.json()]);
-
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowDate = tomorrow.toISOString().slice(0, 10);
-
-  const tmEntries = (fc.list || []).filter((e) => e.dt_txt?.startsWith(tomorrowDate));
-  const tmTemps = tmEntries.map((e) => e.main?.temp_max ?? e.main?.temp ?? 20);
-  const tmHumidity = tmEntries.map((e) => e.main?.humidity ?? 50);
-  const tmWind = tmEntries.map((e) => e.wind?.speed ?? 0);
-
-  const tmMaxTemp = tmTemps.length ? Math.max(...tmTemps) : 30;
-  const tmMinHumidity = tmHumidity.length ? Math.min(...tmHumidity) : 50;
-  const tmMaxWind = tmWind.length ? Math.max(...tmWind) : 0;
-  const tmDesc = tmEntries[Math.floor(tmEntries.length / 2)]?.weather?.[0]?.description || "";
+  // tomorrow = index 1 in daily arrays
+  const tmTempMax = daily.temperature_2m_max?.[1] ?? temp;
+  const tmHumidityMin = daily.relative_humidity_2m_min?.[1] ?? humidity;
+  const tmWindMax = daily.wind_speed_10m_max?.[1] ?? windKmh;
+  const tomorrowDate = daily.time?.[1] ?? null;
 
   const riskModifier = calcRiskModifier({
-    tempC: tmMaxTemp,
-    humidity: tmMinHumidity,
-    windKmh: mpsToKmh(tmMaxWind)
+    tempC: tmTempMax,
+    humidity: tmHumidityMin,
+    windKmh: tmWindMax
   });
 
   return {
     fetched_at: new Date().toISOString(),
     run_date: new Date().toISOString().slice(0, 10),
     current: {
-      temp_c: Math.round(curr.main?.temp * 10) / 10,
-      humidity_pct: curr.main?.humidity ?? null,
-      wind_speed_kmh: mpsToKmh(curr.wind?.speed ?? 0),
-      wind_direction: degToDir(curr.wind?.deg),
-      description: curr.weather?.[0]?.description || "",
-      icon: curr.weather?.[0]?.icon || ""
+      temp_c: Math.round(temp * 10) / 10,
+      humidity_pct: humidity,
+      wind_speed_kmh: Math.round(windKmh * 10) / 10,
+      wind_direction: degToDir(curr.wind_direction_10m),
+      description: weatherCodeToDesc(curr.weather_code),
+      icon: weatherCodeToIcon(curr.weather_code)
     },
     tomorrow: {
       date: tomorrowDate,
-      temp_max_c: Math.round(tmMaxTemp * 10) / 10,
-      humidity_min_pct: tmMinHumidity,
-      wind_max_kmh: mpsToKmh(tmMaxWind),
-      description: tmDesc,
+      temp_max_c: Math.round(tmTempMax * 10) / 10,
+      humidity_min_pct: tmHumidityMin,
+      wind_max_kmh: Math.round(tmWindMax * 10) / 10,
+      description: weatherCodeToDesc(daily.weather_code?.[1]),
       risk_modifier: riskModifier
     }
   };
+}
+
+function weatherCodeToDesc(code) {
+  if (code == null) return "";
+  if (code === 0) return "Clear sky";
+  if (code <= 3) return "Partly cloudy";
+  if (code <= 49) return "Foggy";
+  if (code <= 69) return "Drizzle";
+  if (code <= 79) return "Rain";
+  if (code <= 99) return "Thunderstorm";
+  return "Unknown";
+}
+
+function weatherCodeToIcon(code) {
+  if (code == null) return "";
+  if (code === 0) return "01d";
+  if (code <= 3) return "02d";
+  if (code <= 49) return "50d";
+  if (code <= 79) return "10d";
+  return "11d";
 }

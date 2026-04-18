@@ -158,12 +158,11 @@ export async function runDaily({ date, exportFirst } = {}) {
   }
 
   let weatherData = null;
-  if (!config.useMockEarthEngine && config.owmEnabled && config.owmApiKey) {
+  if (!config.useMockEarthEngine && config.owmEnabled) {
     try {
       weatherData = await fetchRegionWeather({
         lat: config.owmLat,
-        lon: config.owmLon,
-        apiKey: config.owmApiKey
+        lon: config.owmLon
       });
       await writeCollection("weatherData", weatherData);
     } catch (err) {
