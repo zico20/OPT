@@ -4572,12 +4572,14 @@ form,
 
   .dhv2-word-accent {
     font-style: italic;
-    font-family: "Playfair Display", Georgia, "Times New Roman", serif;
-    font-weight: 700;
+    font-family: var(--font-accent), "Playfair Display", Georgia, "Times New Roman", serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
     background: linear-gradient(135deg, #FFB366 0%, #FF6B2B 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    padding-inline-start: 6px;
   }
 
   .dhv2-subtitle {

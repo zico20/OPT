@@ -1,11 +1,18 @@
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
-import { IBM_Plex_Sans, Noto_Sans_Arabic, Sora } from "next/font/google";
+import { IBM_Plex_Sans, Noto_Sans_Arabic, Sora, Playfair_Display } from "next/font/google";
 
 const displayFont = Sora({
   subsets: ["latin"],
   variable: "--font-display",
   weight: ["400", "500", "600", "700", "800"]
+});
+
+const accentFont = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-accent",
+  weight: ["700", "900"],
+  style: ["italic"]
 });
 
 const bodyFont = IBM_Plex_Sans({
@@ -41,7 +48,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${displayFont.variable} ${bodyFont.variable} ${rtlFont.variable}`}
+        className={`${displayFont.variable} ${bodyFont.variable} ${rtlFont.variable} ${accentFont.variable}`}
         suppressHydrationWarning
       >
         {children}
