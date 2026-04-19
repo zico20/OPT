@@ -1,4 +1,5 @@
 ﻿import StickyMissionStrip from "../../../components/StickyMissionStrip";
+import MobileMethodologyV2 from "../../../components/MobileMethodologyV2";
 import MissionStatus from "../../../components/MissionStatus";
 import { getActiveFireDaily, getAlertEvents, getLatestRun } from "../../../lib/data";
 import { getMessages, normalizeLocale } from "../../../lib/i18n";
@@ -21,6 +22,8 @@ export default async function MethodologyPage({ params }) {
 
   return (
     <div className={shellClass} dir={messages.dir}>
+      <MobileMethodologyV2 messages={messages} />
+
       <header className="masthead mission-header">
         <div className="hero-grid hero-grid-compact">
           <div className="hero-copy">

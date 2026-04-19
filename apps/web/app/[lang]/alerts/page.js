@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import StickyMissionStrip from "../../../components/StickyMissionStrip";
 import MissionStatus from "../../../components/MissionStatus";
+import MobileAlertsV2 from "../../../components/MobileAlertsV2";
 import { getAlertEvents, getLatestRun } from "../../../lib/data";
 import { formatPercent, formatProb, riskBadgeTone } from "../../../lib/format";
 import { getMessages, localizeSeverity, normalizeLocale } from "../../../lib/i18n";
@@ -23,6 +24,8 @@ export default async function AlertsPage({ params }) {
 
   return (
     <div className={shellClass} dir={messages.dir}>
+      <MobileAlertsV2 alerts={rows} latestRun={latestRun} messages={messages} />
+
       <header className="masthead mission-header">
         <div className="hero-grid hero-grid-compact">
           <div className="hero-copy">
