@@ -28,7 +28,7 @@ export default function ParticleCanvas() {
       dx: (Math.random() - 0.5) * 0.25,
       dy: (Math.random() - 0.5) * 0.25,
       opacity: Math.random() * 0.55 + 0.08,
-      hue: Math.random() > 0.6 ? 260 : 30
+      hue: Math.random() > 0.5 ? 20 : 35
     }));
 
     function draw() {

@@ -3185,7 +3185,7 @@ form,
     font-size: 1rem;
     font-weight: 800;
     letter-spacing: -0.02em;
-    background: linear-gradient(90deg, #a78bfa, #f97316);
+    background: linear-gradient(90deg, #ff6b2b, #f97316);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -3215,7 +3215,7 @@ form,
   }
 
   .mobile-hamburger:hover {
-    border-color: rgba(167, 139, 250, 0.4);
+    border-color: rgba(255, 107, 43, 0.4);
   }
 
   .mobile-hamburger span {
@@ -3308,8 +3308,8 @@ form,
   }
 
   .mobile-nav-close:hover {
-    background: rgba(167, 139, 250, 0.15);
-    color: #a78bfa;
+    background: rgba(255, 107, 43, 0.15);
+    color: #ff6b2b;
   }
 
   .mobile-nav-links {
@@ -3332,8 +3332,8 @@ form,
   }
 
   .mobile-nav-link:hover {
-    background: rgba(167, 139, 250, 0.1);
-    color: #a78bfa;
+    background: rgba(255, 107, 43, 0.1);
+    color: #ff6b2b;
     padding-left: 22px;
   }
 }
@@ -3356,7 +3356,7 @@ form,
   /* Hero gets a subtle radial glow */
   .masthead.mission-header {
     background: radial-gradient(ellipse 80% 60% at 50% 0%,
-      rgba(109, 40, 217, 0.18) 0%,
+      rgba(220, 60, 20, 0.15) 0%,
       transparent 70%),
       #07060e;
     padding-top: 24px;
@@ -3368,7 +3368,7 @@ form,
     font-weight: 900;
     line-height: 1.1;
     letter-spacing: -0.03em;
-    background: linear-gradient(160deg, #ffffff 30%, #a78bfa 100%);
+    background: linear-gradient(160deg, #ffffff 40%, #ff8c42 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -3379,7 +3379,7 @@ form,
   .stat-card,
   .snapshot-tile {
     background: rgba(20, 16, 36, 0.75);
-    border-color: rgba(167, 139, 250, 0.12);
+    border-color: rgba(255, 107, 43, 0.12);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
@@ -3387,7 +3387,7 @@ form,
   /* Mobile card rows — glass */
   .ops-mobile-feed tr {
     background: rgba(20, 16, 36, 0.7);
-    border-color: rgba(167, 139, 250, 0.1);
+    border-color: rgba(255, 107, 43, 0.1);
     backdrop-filter: blur(6px);
   }
 
@@ -3410,7 +3410,7 @@ form,
   /* Bottom nav — glass */
   .mobile-bottom-nav {
     background: rgba(10, 8, 18, 0.88);
-    border-top-color: rgba(167, 139, 250, 0.1);
+    border-top-color: rgba(255, 107, 43, 0.1);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -3552,7 +3552,7 @@ form,
 
   /* ── 8. Bottom nav – equal sizing + active animation ── */
   .mobile-bottom-nav {
-    border: 1px solid rgba(167, 139, 250, 0.15);
+    border: 1px solid rgba(255, 107, 43, 0.15);
     box-shadow: 0 -2px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
   }
   .mobile-bottom-nav-item {
