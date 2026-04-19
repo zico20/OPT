@@ -3973,3 +3973,378 @@ form,
     animation: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE HOME V2 — Angular-design port (mobile only)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.hsv2-screen {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .hsv2-screen {
+    display: block;
+    padding: 0 0 24px;
+    color: #F5F3EF;
+    font-family: "Inter Tight", var(--font-display), system-ui, sans-serif;
+    --hsv2-bg: #0B0B0E;
+    --hsv2-surface: #121217;
+    --hsv2-surface-2: #1A1A22;
+    --hsv2-border: rgba(255, 255, 255, 0.06);
+    --hsv2-text-muted: rgba(245, 243, 239, 0.62);
+    --hsv2-text-dim: rgba(245, 243, 239, 0.38);
+    --hsv2-radius-md: 14px;
+    --hsv2-radius-xl: 24px;
+  }
+
+  /* Hide existing mobile home content when v2 is active */
+  .home-shell .desktop-hero-details,
+  .home-shell .masthead h1,
+  .home-shell .masthead .hero-eyebrow,
+  .home-shell .mobile-hero-card,
+  .home-shell .section-grid.story-grid,
+  .home-shell .section-grid.narrative-grid,
+  .home-shell .section-grid.mobile-dashboard-sections,
+  .home-shell .split.split-feed,
+  .home-shell .sticky-mission-strip {
+    display: none !important;
+  }
+
+  .home-shell .masthead.mission-header {
+    background: none !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .home-shell .shell {
+    padding: 0 !important;
+    background: #0B0B0E;
+  }
+
+  /* Header */
+  .hsv2-header {
+    padding: 18px 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hsv2-eyebrow {
+    font-size: 10.5px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--hsv2-text-dim);
+    font-weight: 500;
+  }
+
+  .hsv2-eyebrow.hsv2-center { text-align: center; }
+
+  .hsv2-title {
+    margin-top: 4px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .hsv2-title-sub {
+    color: var(--hsv2-text-dim);
+    font-weight: 400;
+    font-size: 14px;
+  }
+
+  .hsv2-pin { font-size: 15px; }
+
+  .hsv2-bell {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: var(--hsv2-surface-2);
+    border: 1px solid var(--hsv2-border);
+    display: grid;
+    place-items: center;
+    position: relative;
+    text-decoration: none;
+    font-size: 16px;
+  }
+
+  .hsv2-bell-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #E52211;
+    border: 2px solid var(--hsv2-bg);
+  }
+
+  /* Hero card — risk-themed radial gradient */
+  .hsv2-hero {
+    margin: 10px 16px 0;
+    padding: 24px 20px 20px;
+    border-radius: var(--hsv2-radius-xl);
+    border: 1px solid var(--hsv2-border);
+    text-align: center;
+    background: radial-gradient(circle at 50% 0%, #1E2E20 0%, #121217 55%);
+    transition: background 400ms ease;
+  }
+
+  .hsv2-screen.risk-low      .hsv2-hero { background: radial-gradient(circle at 50% 0%, #1E2E20 0%, #121217 55%); }
+  .hsv2-screen.risk-moderate .hsv2-hero { background: radial-gradient(circle at 50% 0%, #2F2A1A 0%, #121217 55%); }
+  .hsv2-screen.risk-high     .hsv2-hero { background: radial-gradient(circle at 50% 0%, #3A2518 0%, #121217 55%); }
+  .hsv2-screen.risk-veryHigh .hsv2-hero { background: radial-gradient(circle at 50% 0%, #3C1B14 0%, #121217 55%); }
+  .hsv2-screen.risk-extreme  .hsv2-hero { background: radial-gradient(circle at 50% 0%, #3F1A1A 0%, #121217 55%); }
+
+  .hsv2-gauge-wrap {
+    position: relative;
+    margin-top: 12px;
+    display: inline-block;
+  }
+
+  .hsv2-gauge-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hsv2-fwi {
+    font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 54px;
+    font-weight: 500;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: #F5F3EF;
+  }
+
+  .hsv2-fwi-label {
+    font-size: 9px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--hsv2-text-dim);
+    margin-top: 4px;
+  }
+
+  .hsv2-risk-label {
+    margin-top: 18px;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+  }
+
+  .hsv2-stay-alert {
+    margin: 4px 0 16px;
+    font-size: 12px;
+    color: var(--hsv2-text-muted);
+  }
+
+  .hsv2-pips {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+  }
+
+  .hsv2-pip {
+    width: 28px;
+    height: 6px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    transition: background 300ms ease;
+  }
+
+  .hsv2-conditions {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--hsv2-border);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .hsv2-cond {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    border-inline-end: 1px solid var(--hsv2-border);
+    padding: 0 4px;
+  }
+
+  .hsv2-cond:last-child { border-inline-end: none; }
+
+  .hsv2-cond-icon { font-size: 16px; }
+
+  .hsv2-cond-v {
+    font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 14px;
+    letter-spacing: -0.5px;
+    color: #F5F3EF;
+  }
+
+  .hsv2-cond-dir {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--hsv2-text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .hsv2-section-head {
+    margin: 24px 16px 10px;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--hsv2-text-muted);
+    font-weight: 500;
+  }
+
+  .hsv2-section-head.hsv2-with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hsv2-section-action {
+    background: transparent;
+    border: none;
+    color: #FF8A3D;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .hsv2-contribs {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .hsv2-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--hsv2-surface-2);
+    border-radius: 12px;
+    border: 1px solid var(--hsv2-border);
+  }
+
+  .hsv2-row-label { flex: 1; font-size: 13px; }
+
+  .hsv2-row-value {
+    font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    color: var(--hsv2-text-muted);
+    min-width: 56px;
+    text-align: end;
+  }
+
+  .hsv2-row-bar {
+    width: 64px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+  }
+
+  .hsv2-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .hsv2-hourly {
+    margin: 0 16px;
+    padding: 16px 12px;
+    background: var(--hsv2-surface-2);
+    border-radius: var(--hsv2-radius-md);
+    border: 1px solid var(--hsv2-border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2px;
+    height: 100px;
+    direction: ltr;
+  }
+
+  .hsv2-h-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hsv2-h-fwi {
+    font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .hsv2-h-bar {
+    width: 70%;
+    border-radius: 3px 3px 0 0;
+    transition: height 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .hsv2-h-hr {
+    font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    color: var(--hsv2-text-dim);
+  }
+
+  .hsv2-incident {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--hsv2-surface-2);
+    border-radius: var(--hsv2-radius-md);
+    border: 1px solid var(--hsv2-border);
+    margin: 0 16px 8px;
+  }
+
+  .hsv2-inc-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .hsv2-inc-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hsv2-inc-name {
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .hsv2-inc-meta {
+    font-size: 11px;
+    color: var(--hsv2-text-muted);
+    margin-top: 2px;
+  }
+
+  .hsv2-inc-bar {
+    width: 50px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+}

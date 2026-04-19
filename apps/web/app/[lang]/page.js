@@ -10,6 +10,7 @@ import LastUpdatedBadge from "../../components/LastUpdatedBadge";
 import PushSubscribeButton from "../../components/PushSubscribeButton";
 import WeatherStrip from "../../components/WeatherStrip";
 import MobileHeroCard from "../../components/MobileHeroCard";
+import MobileHomeV2 from "../../components/MobileHomeV2";
 import {
   getActiveFireDaily,
   getAlertEvents,
@@ -80,6 +81,15 @@ export default async function DashboardPage({ params }) {
 
   return (
     <div className={shellClass} dir={messages.dir}>
+      <MobileHomeV2
+        topDistrict={districts[0]}
+        weather={weather}
+        fires={fires}
+        districts={districts}
+        latestRun={latestRun}
+        locale={locale}
+      />
+
       <header className="masthead mission-header">
         <div className="hero-topbar">
           <div className="hero-topbar-left">
