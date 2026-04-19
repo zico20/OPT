@@ -3711,6 +3711,80 @@ form,
     color: rgba(255, 255, 255, 0.9);
   }
 
+  .mhc-head-sep {
+    color: rgba(255, 255, 255, 0.25);
+    font-weight: 400;
+  }
+
+  .mhc-focus {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.78);
+    letter-spacing: -0.01em;
+  }
+
+  /* Two-column main row: primary number + secondary metric */
+  .mhc-main-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    align-items: end;
+  }
+
+  .mhc-main-secondary .mhc-big-label {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .mhc-mid-number {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  /* Mini sparkline of top districts */
+  .mhc-sparkline-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .mhc-sparkline-label {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .mhc-sparkline {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 3px;
+    height: 40px;
+    padding: 2px 0;
+  }
+
+  .mhc-spark-bar {
+    flex: 1;
+    min-width: 0;
+    border-radius: 2px 2px 1px 1px;
+    opacity: 0.9;
+    transition: height 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    min-height: 4px;
+  }
+
+  .mhc-meta-mono {
+    font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 0.68rem;
+  }
+
   /* Main: big critical districts number */
   .mhc-main {
     display: flex;

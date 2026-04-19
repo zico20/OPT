@@ -119,8 +119,13 @@ export default async function DashboardPage({ params }) {
             <MobileHeroCard
               missionState={missionState}
               missionTitle={missionTitle}
+              focusLabel={focusLabel}
               criticalCount={criticalDistricts}
               hotspotCount={activeFireDistricts}
+              peakProbability={peakProbability}
+              highRiskArea={highestArea}
+              runDate={runDate}
+              districts={districts}
               updatedAt={latestRun?.finished_at || latestRun?.started_at}
               weather={weather}
             />
