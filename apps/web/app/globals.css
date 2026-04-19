@@ -3803,3 +3803,173 @@ form,
     white-space: nowrap;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SPLASH SCREEN — intro animation
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #07060a;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+}
+
+.splash-screen.exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 45%, rgba(255, 107, 43, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 50% 60%, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
+  animation: splash-glow-pulse 2.5s ease-in-out;
+}
+
+@keyframes splash-glow-pulse {
+  0%   { opacity: 0; transform: scale(0.9); }
+  30%  { opacity: 1; transform: scale(1); }
+  80%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+.splash-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  animation: splash-content-in 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes splash-content-in {
+  0%   { opacity: 0; transform: translateY(16px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.splash-screen.exiting .splash-content {
+  animation: splash-content-out 500ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes splash-content-out {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-8px) scale(1.04); }
+}
+
+.splash-mark {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 107, 43, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: splash-mark-spin 2.4s linear;
+  position: relative;
+}
+
+.splash-mark::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 107, 43, 0.15);
+  animation: splash-mark-ring 2.4s ease-out;
+}
+
+@keyframes splash-mark-spin {
+  0%   { transform: rotate(0deg) scale(0.7); opacity: 0; }
+  25%  { transform: rotate(90deg) scale(1); opacity: 1; }
+  100% { transform: rotate(360deg) scale(1); opacity: 1; }
+}
+
+@keyframes splash-mark-ring {
+  0%   { transform: scale(0.8); opacity: 0; }
+  30%  { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.splash-mark-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff6b2b;
+  box-shadow: 0 0 24px rgba(255, 107, 43, 0.9);
+  animation: splash-dot-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes splash-dot-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 24px rgba(255, 107, 43, 0.9); }
+  50%      { transform: scale(1.15); box-shadow: 0 0 36px rgba(255, 107, 43, 1); }
+}
+
+.splash-title {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin: 0;
+  background: linear-gradient(135deg, #ffffff 0%, #ffcea1 50%, #ff6b2b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: splash-title-shimmer 2.4s ease-in-out;
+  background-size: 200% 100%;
+}
+
+@keyframes splash-title-shimmer {
+  0%   { background-position: 100% 0; }
+  50%  { background-position: 0 0; }
+  100% { background-position: -100% 0; }
+}
+
+.splash-tagline {
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0;
+  animation: splash-tagline-in 1.2s ease-out 300ms both;
+}
+
+@keyframes splash-tagline-in {
+  0%   { opacity: 0; letter-spacing: 0.3em; }
+  100% { opacity: 1; letter-spacing: 0.15em; }
+}
+
+@media (max-width: 760px) {
+  .splash-title {
+    font-size: 2rem;
+  }
+  .splash-tagline {
+    font-size: 0.72rem;
+  }
+  .splash-mark {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen,
+  .splash-content,
+  .splash-glow,
+  .splash-mark,
+  .splash-mark-dot,
+  .splash-title,
+  .splash-tagline {
+    animation: none !important;
+  }
+}
