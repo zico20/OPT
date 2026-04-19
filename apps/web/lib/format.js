@@ -21,10 +21,12 @@ export function formatPercent(value, locale = "en") {
 }
 
 export function formatProb(value, locale = "en") {
-  return formatNumber(value, locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  });
+  const num = Number(value ?? 0);
+  if (!Number.isFinite(num)) return "-";
+  return `${formatNumber(num * 100, locale, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  })}%`;
 }
 
 export function riskBadgeTone(label) {
