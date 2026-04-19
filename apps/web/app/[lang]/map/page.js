@@ -34,7 +34,7 @@ export default async function MapPage({ params }) {
 
   const missionState = deriveMissionState({ latestRun, districts, fires, alerts });
   const focusLabel = fires[0]?.district_name || districts[0]?.district_name || "";
-  const shellClass = ["shell", "mission-shell", "hsv2-map-shell", "mission-" + missionState, messages.dir === "rtl" ? "rtl" : ""].filter(Boolean).join(" ");
+  const shellClass = ["shell", "mission-shell", "mission-" + missionState, messages.dir === "rtl" ? "rtl" : ""].filter(Boolean).join(" ");
 
   const stats = [
     { label: messages.home.lastRun, value: latestRun?.run_date || "-" },
