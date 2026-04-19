@@ -9,6 +9,7 @@ import InsightCarousel from "../../components/InsightCarousel";
 import LastUpdatedBadge from "../../components/LastUpdatedBadge";
 import PushSubscribeButton from "../../components/PushSubscribeButton";
 import WeatherStrip from "../../components/WeatherStrip";
+import MobileHeroCard from "../../components/MobileHeroCard";
 import {
   getActiveFireDaily,
   getAlertEvents,
@@ -114,36 +115,48 @@ export default async function DashboardPage({ params }) {
           <div className="hero-copy">
             <span className="eyebrow hero-eyebrow">{messages.home.eyebrow}</span>
             <h1>{messages.appName}</h1>
-            <p>{messages.home.intro}</p>
 
-            <WeatherStrip weather={weather} />
-            <div className="hero-signal-row">
-              <span className="signal-pill"><MicroIcon name="calendar" /><span>{messages.home.lastRun}: {runDate}</span></span>
-              <span className="signal-pill"><MicroIcon name="flame" /><span>{messages.home.hotspots}: {activeFireDistricts}</span></span>
-              <span className="signal-pill"><MicroIcon name="alert" /><span>{messages.home.criticalDistricts}: {criticalDistricts}</span></span>
-              <LastUpdatedBadge timestamp={latestRun?.finished_at || latestRun?.started_at} />
+            <MobileHeroCard
+              missionState={missionState}
+              missionTitle={missionTitle}
+              criticalCount={criticalDistricts}
+              hotspotCount={activeFireDistricts}
+              updatedAt={latestRun?.finished_at || latestRun?.started_at}
+              weather={weather}
+            />
+
+            <div className="desktop-hero-details">
+              <p>{messages.home.intro}</p>
+
+              <WeatherStrip weather={weather} />
+              <div className="hero-signal-row">
+                <span className="signal-pill"><MicroIcon name="calendar" /><span>{messages.home.lastRun}: {runDate}</span></span>
+                <span className="signal-pill"><MicroIcon name="flame" /><span>{messages.home.hotspots}: {activeFireDistricts}</span></span>
+                <span className="signal-pill"><MicroIcon name="alert" /><span>{messages.home.criticalDistricts}: {criticalDistricts}</span></span>
+                <LastUpdatedBadge timestamp={latestRun?.finished_at || latestRun?.started_at} />
+              </div>
+
+              <MissionStatus messages={messages} state={missionState} focusLabel={focusLabel} compact />
+
+              <section className="hero-stats compact-stats">
+                <article className="stat-card stat-card-compact">
+                  <div className="stat-label">{messages.home.lastRun}</div>
+                  <div className="stat-value stat-value-compact">{runDate}</div>
+                </article>
+                <article className="stat-card stat-card-compact">
+                  <div className="stat-label">{messages.home.threshold}</div>
+                  <div className="stat-value stat-value-compact">{selectedThreshold}</div>
+                </article>
+                <article className="stat-card stat-card-compact">
+                  <div className="stat-label">{messages.home.criticalDistricts}</div>
+                  <div className="stat-value stat-value-compact">{criticalDistricts}</div>
+                </article>
+                <article className="stat-card stat-card-compact">
+                  <div className="stat-label">{messages.home.activeFireDistricts}</div>
+                  <div className="stat-value stat-value-compact">{activeFireDistricts}</div>
+                </article>
+              </section>
             </div>
-
-            <MissionStatus messages={messages} state={missionState} focusLabel={focusLabel} compact />
-
-            <section className="hero-stats compact-stats">
-              <article className="stat-card stat-card-compact">
-                <div className="stat-label">{messages.home.lastRun}</div>
-                <div className="stat-value stat-value-compact">{runDate}</div>
-              </article>
-              <article className="stat-card stat-card-compact">
-                <div className="stat-label">{messages.home.threshold}</div>
-                <div className="stat-value stat-value-compact">{selectedThreshold}</div>
-              </article>
-              <article className="stat-card stat-card-compact">
-                <div className="stat-label">{messages.home.criticalDistricts}</div>
-                <div className="stat-value stat-value-compact">{criticalDistricts}</div>
-              </article>
-              <article className="stat-card stat-card-compact">
-                <div className="stat-label">{messages.home.activeFireDistricts}</div>
-                <div className="stat-value stat-value-compact">{activeFireDistricts}</div>
-              </article>
-            </section>
           </div>
 
           <div className="desktop-hero-side" id="operational-map">

@@ -3591,3 +3591,215 @@ form,
   right: auto;
   left: 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE HERO CARD — unified at-a-glance status card
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.mobile-hero-card {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  /* Hide the verbose desktop hero details on mobile */
+  .desktop-hero-details {
+    display: none;
+  }
+
+  /* Scale down the h1 so the hero card takes center stage */
+  .masthead h1 {
+    font-size: 1.5rem !important;
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+
+  .masthead {
+    padding: 18px 16px 20px !important;
+  }
+
+  /* The card itself */
+  .mobile-hero-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: radial-gradient(ellipse 100% 80% at 50% 0%,
+      rgba(255, 107, 43, 0.14) 0%,
+      rgba(20, 16, 24, 0.85) 60%,
+      rgba(14, 12, 18, 0.9) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* State-specific accent colors */
+  .mobile-hero-card.state-incident {
+    background: radial-gradient(ellipse 100% 80% at 50% 0%,
+      rgba(239, 68, 68, 0.22) 0%,
+      rgba(20, 10, 10, 0.88) 55%,
+      rgba(14, 10, 12, 0.92) 100%);
+    border-color: rgba(239, 68, 68, 0.22);
+  }
+  .mobile-hero-card.state-escalation {
+    background: radial-gradient(ellipse 100% 80% at 50% 0%,
+      rgba(255, 107, 43, 0.22) 0%,
+      rgba(20, 14, 10, 0.88) 55%,
+      rgba(14, 12, 10, 0.92) 100%);
+    border-color: rgba(255, 107, 43, 0.22);
+  }
+  .mobile-hero-card.state-monitoring {
+    background: radial-gradient(ellipse 100% 80% at 50% 0%,
+      rgba(34, 197, 94, 0.14) 0%,
+      rgba(14, 18, 16, 0.88) 55%,
+      rgba(12, 14, 14, 0.92) 100%);
+    border-color: rgba(34, 197, 94, 0.18);
+  }
+
+  /* Head: state pill with dot */
+  .mhc-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mhc-state-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: mhc-pulse 2s ease-in-out infinite;
+  }
+
+  .state-incident .mhc-state-dot { background: #ef4444; box-shadow: 0 0 12px rgba(239, 68, 68, 0.7); }
+  .state-escalation .mhc-state-dot { background: #ff6b2b; box-shadow: 0 0 12px rgba(255, 107, 43, 0.7); }
+  .state-monitoring .mhc-state-dot { background: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.5); }
+
+  @keyframes mhc-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(0.8); }
+  }
+
+  .mhc-state-pill {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Main: big critical districts number */
+  .mhc-main {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 4px 0 6px;
+  }
+
+  .mhc-big-number {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: #fff;
+  }
+
+  .state-incident .mhc-big-number { color: #ef4444; }
+  .state-escalation .mhc-big-number { color: #ff6b2b; }
+
+  .mhc-big-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.02em;
+  }
+
+  /* Forecast indicator */
+  .mhc-forecast {
+    display: inline-flex;
+    align-self: flex-start;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+  }
+
+  .mhc-forecast-up {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ff8a6a;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+  .mhc-forecast-down {
+    background: rgba(34, 197, 94, 0.1);
+    color: #86efac;
+    border-color: rgba(34, 197, 94, 0.25);
+  }
+  .mhc-forecast-flat {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.55);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Meta row: hotspots + updated */
+  .mhc-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.55);
+    flex-wrap: wrap;
+  }
+
+  .mhc-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .mhc-meta-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.45);
+  }
+
+  .mhc-meta-muted {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* Weather row */
+  .mhc-weather {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .mhc-weather-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    flex: 1;
+  }
+
+  .mhc-weather-icon {
+    font-size: 0.95rem;
+    opacity: 0.75;
+  }
+
+  .mhc-weather-value {
+    font-family: var(--font-display);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.88);
+    white-space: nowrap;
+  }
+}
