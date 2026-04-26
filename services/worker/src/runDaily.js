@@ -1,5 +1,11 @@
 import { getConfig } from "./config.js";
-import { shouldSendAlert, buildTelegramMessage } from "./alertRules.js";
+import {
+  shouldSendAlert,
+  buildTelegramMessage,
+  buildDigestMessage,
+  buildCriticalMessage,
+  hasEscalated
+} from "./alertRules.js";
 import { sendTelegramMessage } from "./telegram.js";
 import { runOperationalInference, exportOperationalAssets } from "./earthEngine.js";
 import { fetchFirmsHotspots } from "./firms.js";
@@ -46,10 +52,8 @@ function getTodayString() {
   return new Date().toISOString().slice(0, 10);
 }
 
-async function buildAlertEvents({ run, districtRiskDaily, config }) {
+async function buildAlertEvents({ run, districtRiskDaily, prevSeverityByDistrict, config }) {
   const rules = await readCollection("alertRules");
-  const subscribers = await readCollection("subscribers");
-  const activeSubscribers = subscribers.filter((subscriber) => subscriber.enabled);
   const alertEvents = [];
 
   for (const district of districtRiskDaily) {
@@ -58,41 +62,16 @@ async function buildAlertEvents({ run, districtRiskDaily, config }) {
       continue;
     }
 
-    const message = buildTelegramMessage({
+    const previousSeverity = prevSeverityByDistrict.get(district.district_id) || null;
+    const escalated = hasEscalated(alert.severity, previousSeverity);
+
+    const previewMessage = buildTelegramMessage({
       runDate: run.run_date,
       district,
       appUrl: config.publicAppUrl,
       severity: alert.severity,
       triggerReason: alert.trigger_reason
     });
-
-    let scopedSubscribers = activeSubscribers.filter((subscriber) => (
-      subscriber.district_scope === "all" || subscriber.district_scope === district.district_id
-    ));
-
-    if (scopedSubscribers.length === 0 && config.telegramDefaultChatId) {
-      scopedSubscribers = [{
-        subscriber_id: "env_default",
-        district_scope: "all",
-        chat_id: config.telegramDefaultChatId,
-        enabled: true
-      }];
-    }
-
-    let messageStatus = "skipped";
-    if (scopedSubscribers.length > 0) {
-      const results = await Promise.all(scopedSubscribers.map((subscriber) => (
-        sendTelegramMessage({
-          botToken: config.telegramBotToken,
-          chatId: subscriber.chat_id || config.telegramDefaultChatId,
-          message
-        })
-      )));
-      messageStatus = results.every((result) => result.ok) ? "sent" : "partial";
-      if (results.every((result) => result.skipped)) {
-        messageStatus = "preview";
-      }
-    }
 
     alertEvents.push({
       alert_id: `alert_${run.run_date.replaceAll("-", "")}_${district.district_id}`,
@@ -105,13 +84,105 @@ async function buildAlertEvents({ run, districtRiskDaily, config }) {
       high_or_very_high_area_pct: district.high_or_very_high_area_pct,
       hotspot_count_24h: district.hotspot_count_24h,
       channel: "telegram",
-      message_status: messageStatus,
+      message_status: escalated ? "pending_send" : "suppressed_no_escalation",
       sent_at: new Date().toISOString(),
-      preview_message: message
+      preview_message: previewMessage,
+      _district: district,
+      _escalated: escalated,
+      _previousSeverity: previousSeverity
     });
   }
 
   return alertEvents;
+}
+
+async function deliverTelegramAlerts({ runDate, alertEvents, crisisEndedDistricts, config }) {
+  const subscribers = await readCollection("subscribers");
+  let recipients = subscribers.filter((s) => s.enabled);
+
+  if (recipients.length === 0 && config.telegramDefaultChatId) {
+    recipients = [{
+      subscriber_id: "env_default",
+      district_scope: "all",
+      chat_id: config.telegramDefaultChatId,
+      enabled: true
+    }];
+  }
+
+  const escalatedAlerts = alertEvents.filter((e) => e._escalated);
+  const newCriticalAlerts = escalatedAlerts.filter((e) => e.severity === "Critical");
+  const clearedEntries = crisisEndedDistricts.map((d) => ({ district: d }));
+
+  if (escalatedAlerts.length === 0 && clearedEntries.length === 0) {
+    return;
+  }
+
+  if (!config.telegramBotToken || recipients.length === 0) {
+    for (const e of escalatedAlerts) e.message_status = "skipped_no_recipients";
+    return;
+  }
+
+  const send = (chatId, message) => sendTelegramMessage({
+    botToken: config.telegramBotToken,
+    chatId,
+    message,
+    parseMode: "HTML",
+    disableWebPagePreview: true
+  }).catch((err) => ({ ok: false, skipped: false, reason: err.message }));
+
+  const markStatus = (alerts, ok) => {
+    for (const a of alerts) {
+      if (ok) a.message_status = "sent";
+      else if (a.message_status === "pending_send") a.message_status = "partial";
+    }
+  };
+
+  for (const recipient of recipients) {
+    const scope = recipient.district_scope || "all";
+
+    const visibleAlerts = scope === "all"
+      ? escalatedAlerts
+      : escalatedAlerts.filter((e) => e.district_id === scope);
+    const visibleCleared = scope === "all"
+      ? clearedEntries
+      : clearedEntries.filter((c) => c.district.district_id === scope);
+    const visibleCriticals = scope === "all"
+      ? newCriticalAlerts
+      : newCriticalAlerts.filter((e) => e.district_id === scope);
+
+    if (visibleAlerts.length === 0 && visibleCleared.length === 0) continue;
+
+    const chatId = recipient.chat_id || config.telegramDefaultChatId;
+    if (!chatId) continue;
+
+    let allOk = true;
+
+    for (const critical of visibleCriticals) {
+      const msg = buildCriticalMessage({
+        runDate,
+        district: critical._district,
+        triggerReason: critical.trigger_reason,
+        appUrl: config.publicAppUrl
+      });
+      const result = await send(chatId, msg);
+      if (!result.ok) allOk = false;
+    }
+
+    const digest = buildDigestMessage({
+      runDate,
+      alerts: visibleAlerts.map((e) => ({
+        severity: e.severity,
+        district: e._district,
+        triggerReason: e.trigger_reason
+      })),
+      cleared: visibleCleared,
+      appUrl: config.publicAppUrl
+    });
+    const digestResult = await send(chatId, digest);
+    if (!digestResult.ok) allOk = false;
+
+    markStatus(visibleAlerts, allOk);
+  }
 }
 
 export async function runDaily({ date, exportFirst } = {}) {
@@ -203,9 +274,20 @@ export async function runDaily({ date, exportFirst } = {}) {
       .map((a) => a.district_id)
   );
 
+  const prevSeverityByDistrict = new Map();
+  for (const a of previousAlerts) {
+    if (!a.sent_at || a.sent_at < fortyEightHoursAgo) continue;
+    const existing = prevSeverityByDistrict.get(a.district_id);
+    if (!existing || a.sent_at > existing.sent_at) {
+      prevSeverityByDistrict.set(a.district_id, { severity: a.severity, sent_at: a.sent_at });
+    }
+  }
+  for (const [k, v] of prevSeverityByDistrict) prevSeverityByDistrict.set(k, v.severity);
+
   const alertEvents = await buildAlertEvents({
     run,
     districtRiskDaily,
+    prevSeverityByDistrict,
     config
   });
 
@@ -215,21 +297,14 @@ export async function runDaily({ date, exportFirst } = {}) {
     return wasAlerted && nowSafe;
   });
 
+  await deliverTelegramAlerts({
+    runDate: run.run_date,
+    alertEvents,
+    crisisEndedDistricts,
+    config
+  });
+
   for (const district of crisisEndedDistricts) {
-    const message =
-      `\u2705 All Clear — ${district.district_name}\n` +
-      `\ud83d\udcc5 Date: ${run.run_date}\n` +
-      `Fire risk has dropped below alert threshold.\n` +
-      `Dashboard: ${config.publicAppUrl}`;
-
-    if (config.telegramBotToken && config.telegramDefaultChatId) {
-      await sendTelegramMessage({
-        botToken: config.telegramBotToken,
-        chatId: config.telegramDefaultChatId,
-        message
-      }).catch((err) => console.error("[crisis-ended] Telegram failed:", err.message));
-    }
-
     await sendWebPushNotifications({
       title: `\u2705 All Clear — ${district.district_name}`,
       body: "Fire risk has dropped below the alert threshold.",
@@ -246,10 +321,12 @@ export async function runDaily({ date, exportFirst } = {}) {
     }).catch((err) => console.error("[push] Alert push failed:", err.message));
   }
 
+  const persistedAlertEvents = alertEvents.map(({ _district, _escalated, _previousSeverity, ...rest }) => rest);
+
   await replaceLatestRun(run);
   await writeCollection("districtRiskDaily", districtRiskDaily);
   await writeCollection("activeFireDaily", activeFireDaily);
-  await writeCollection("alertEvents", alertEvents);
+  await writeCollection("alertEvents", persistedAlertEvents);
 
   return {
     run,

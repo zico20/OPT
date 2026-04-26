@@ -62,3 +62,84 @@ export function buildTelegramMessage({ runDate, district, appUrl, severity, trig
   ].join("\n");
 }
 
+const SEVERITY_RANK = { Watch: 1, Warning: 2, Critical: 3 };
+const SEVERITY_EMOJI = { Critical: "\u{1F534}", Warning: "\u{1F7E0}", Watch: "\u{1F7E1}" };
+
+export function severityRank(severity) {
+  return SEVERITY_RANK[severity] || 0;
+}
+
+export function hasEscalated(currentSeverity, previousSeverity) {
+  return severityRank(currentSeverity) > severityRank(previousSeverity);
+}
+
+export function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function formatDistrictLine(d) {
+  const name = escapeHtml(d.district_name);
+  const prob = Number(d.max_fire_prob || 0).toFixed(2);
+  const hotspots = Number(d.hotspot_count_24h || 0);
+  const hotspotPart = hotspots > 0 ? `, ${hotspots} hotspot${hotspots === 1 ? "" : "s"}` : "";
+  return `   • <b>${name}</b> — prob ${prob}${hotspotPart}`;
+}
+
+export function buildCriticalMessage({ runDate, district, triggerReason, appUrl }) {
+  const name = escapeHtml(district.district_name);
+  const prob = Number(district.max_fire_prob || 0).toFixed(2);
+  const areaPct = Number(district.high_or_very_high_area_pct || 0).toFixed(1);
+  const hotspots = Number(district.hotspot_count_24h || 0);
+  const reason = escapeHtml(triggerReason);
+  const url = escapeHtml(appUrl || "");
+
+  return [
+    `\u{1F6A8} <b>CRITICAL FIRE ALERT</b>`,
+    `\u{1F4CD} District: <b>${name}</b>`,
+    `\u{1F4C5} Date: ${runDate}`,
+    ``,
+    `\u{1F525} Max probability: <b>${prob}</b>`,
+    `\u{1F4CA} High-risk area: ${areaPct}%`,
+    `\u{1F6F0} Hotspots (24h): ${hotspots}`,
+    ``,
+    `<i>${reason}</i>`,
+    ``,
+    `\u{1F517} <a href="${url}">Open dashboard</a>`
+  ].join("\n");
+}
+
+/**
+ * alerts: [{ severity, district, triggerReason }]
+ * cleared: [{ district }]
+ */
+export function buildDigestMessage({ runDate, alerts, cleared = [], appUrl }) {
+  const grouped = { Critical: [], Warning: [], Watch: [] };
+  for (const a of alerts) grouped[a.severity]?.push(a);
+
+  const lines = [
+    `\u{1F525} <b>HazardSignal — Daily Risk Digest</b>`,
+    `\u{1F4C5} ${runDate}`,
+    ``
+  ];
+
+  for (const sev of ["Critical", "Warning", "Watch"]) {
+    const list = grouped[sev];
+    if (!list || list.length === 0) continue;
+    lines.push(`${SEVERITY_EMOJI[sev]} <b>${sev}</b> (${list.length} new)`);
+    for (const a of list) lines.push(formatDistrictLine(a.district));
+    lines.push("");
+  }
+
+  if (cleared.length > 0) {
+    lines.push(`✅ <b>All Clear</b> (${cleared.length})`);
+    for (const c of cleared) lines.push(`   • ${escapeHtml(c.district.district_name)}`);
+    lines.push("");
+  }
+
+  lines.push(`\u{1F517} <a href="${escapeHtml(appUrl || "")}">Open dashboard</a>`);
+  return lines.join("\n");
+}
+

@@ -1,4 +1,11 @@
-export async function sendTelegramMessage({ botToken, chatId, message }) {
+export async function sendTelegramMessage({
+  botToken,
+  chatId,
+  message,
+  parseMode,
+  disableNotification,
+  disableWebPagePreview
+}) {
   if (!botToken || !chatId) {
     return {
       ok: false,
@@ -7,15 +14,20 @@ export async function sendTelegramMessage({ botToken, chatId, message }) {
     };
   }
 
+  const payload = {
+    chat_id: chatId,
+    text: message
+  };
+  if (parseMode) payload.parse_mode = parseMode;
+  if (disableNotification) payload.disable_notification = true;
+  if (disableWebPagePreview) payload.disable_web_page_preview = true;
+
   const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: message
-    })
+    body: JSON.stringify(payload)
   });
 
   if (!response.ok) {
