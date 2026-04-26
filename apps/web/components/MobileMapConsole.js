@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import RiskMapShell from "./RiskMapShell";
 import MobileTopBar from "./MobileTopBar";
+import MobileMapLayerToggles from "./MobileMapLayerToggles";
 
 const SEVERITY_PILL = {
   critical: { label: "CRITICAL", icon: "🔥" },
@@ -39,22 +43,35 @@ export default function MobileMapConsole({
   peakProbability = 0,
   runDate = "-"
 }) {
-  const lead = districts[0] || null;
+  const [topIdx, setTopIdx] = useState(0);
+  const [layers, setLayers] = useState({ districts: true, fires: true });
+
+  const top3 = districts.slice(0, 3);
+  const lead = top3[topIdx] || top3[0] || null;
   const leadProbClass = lead ? classFromProb(Number(lead.max_fire_prob || 0)) : "very-low";
   const leadColor = colorFromClass(leadProbClass);
   const severityKey = (lead?.operational_severity || missionState || "monitoring").toLowerCase();
   const pill = SEVERITY_PILL[severityKey] || SEVERITY_PILL.monitoring;
-  const probDisplay = Number(peakProbability || lead?.max_fire_prob || 0).toFixed(2);
-  const fireCount = Array.isArray(fires) ? fires.length : 0;
+  const probDisplay = Number(lead?.max_fire_prob || peakProbability || 0).toFixed(2);
+
+  const visibleDistricts = layers.districts ? districts : [];
+  const visibleFires = layers.fires ? fires : [];
+  const fireCount = visibleFires.length;
 
   return (
     <div className="m-live" data-severity={severityKey}>
-      <MobileTopBar tab="live" locale={locale} runDate={runDate} showScale={true} />
+      <MobileTopBar
+        tab="live"
+        locale={locale}
+        runDate={runDate}
+        showScale={true}
+        rightSlot={<MobileMapLayerToggles onToggle={setLayers} />}
+      />
 
       <div className="m-live-map">
         <RiskMapShell
-          districts={districts}
-          fires={fires}
+          districts={visibleDistricts}
+          fires={visibleFires}
           messages={messages?.map || messages}
           locale={locale}
           missionState={missionState}
@@ -62,9 +79,26 @@ export default function MobileMapConsole({
       </div>
 
       <div className="m-live-card">
-        <div className="m-live-pill" data-severity={severityKey}>
-          <span className="m-live-pill-icon" aria-hidden="true">{pill.icon}</span>
-          <span className="m-live-pill-text">{pill.label}</span>
+        <div className="m-live-card-top">
+          <div className="m-live-pill" data-severity={severityKey}>
+            <span className="m-live-pill-icon" aria-hidden="true">{pill.icon}</span>
+            <span className="m-live-pill-text">{pill.label}</span>
+          </div>
+
+          {top3.length > 1 && (
+            <div className="m-live-dots" role="tablist" aria-label="Top districts">
+              {top3.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={["m-live-dot", i === topIdx ? "active" : ""].filter(Boolean).join(" ")}
+                  onClick={() => setTopIdx(i)}
+                  aria-label={`Show district ${i + 1}`}
+                  aria-selected={i === topIdx}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="m-live-headline">

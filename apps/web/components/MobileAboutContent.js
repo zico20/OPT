@@ -6,6 +6,9 @@ const COPY = {
     eyebrow: "ABOUT",
     title: "HazardSignal",
     tagline: "Daily wildfire risk signals for the Antalya region.",
+    statsDistricts: "Districts",
+    statsAlerts: "Alerts (30d)",
+    statsLastRun: "Last run",
     mission: "Mission",
     missionBody: "We combine satellite imagery, weather data, and machine learning to surface fire risk before ignition. Our goal: make signals reach the right people in time.",
     coverage: "Coverage",
@@ -20,6 +23,9 @@ const COPY = {
     eyebrow: "حول",
     title: "HazardSignal",
     tagline: "إشارات يومية لخطر الحرائق في إقليم أنطاليا.",
+    statsDistricts: "مناطق",
+    statsAlerts: "تنبيهات (30ي)",
+    statsLastRun: "آخر تشغيل",
     mission: "المهمّة",
     missionBody: "ندمج صور الأقمار، بيانات الطقس، وتعلّم الآلة لكشف خطر الحريق قبل اندلاعه. هدفنا: إيصال الإشارة للناس في الوقت المناسب.",
     coverage: "التغطية",
@@ -34,6 +40,9 @@ const COPY = {
     eyebrow: "HAKKINDA",
     title: "HazardSignal",
     tagline: "Antalya bölgesi için günlük orman yangını risk sinyalleri.",
+    statsDistricts: "İlçe",
+    statsAlerts: "Uyarı (30g)",
+    statsLastRun: "Son güncelleme",
     mission: "Misyon",
     missionBody: "Uydu görüntüleri, hava verileri ve makine öğrenmesini birleştirerek yangın çıkmadan önce riski tespit ediyoruz.",
     coverage: "Kapsam",
@@ -46,7 +55,7 @@ const COPY = {
   }
 };
 
-export default function MobileAboutContent({ locale = "en", runDate = "-" }) {
+export default function MobileAboutContent({ locale = "en", runDate = "-", stats = null }) {
   const c = COPY[locale] || COPY.en;
 
   return (
@@ -66,6 +75,23 @@ export default function MobileAboutContent({ locale = "en", runDate = "-" }) {
           <h1 className="m-about-title">{c.title}</h1>
           <p className="m-about-tagline">{c.tagline}</p>
         </section>
+
+        {stats && (
+          <section className="m-about-stats">
+            <div className="m-about-stat">
+              <span className="m-about-stat-num">{stats.districts}</span>
+              <span className="m-about-stat-label">{c.statsDistricts}</span>
+            </div>
+            <div className="m-about-stat">
+              <span className="m-about-stat-num">{stats.alerts30d}</span>
+              <span className="m-about-stat-label">{c.statsAlerts}</span>
+            </div>
+            <div className="m-about-stat">
+              <span className="m-about-stat-num">{stats.runDate.slice(5) || "-"}</span>
+              <span className="m-about-stat-label">{c.statsLastRun}</span>
+            </div>
+          </section>
+        )}
 
         <section className="m-about-card">
           <h3 className="m-about-card-title">{c.mission}</h3>
