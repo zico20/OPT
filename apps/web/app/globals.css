@@ -5446,14 +5446,12 @@ form,
   .m-route-mobile-only { display: block; }
   .m-route-desktop-only { display: none !important; }
 
-  /* Lock the page so the mobile shell behaves like a native app */
-  html, body { overflow: hidden; height: 100%; background: #07060a; }
-  body, .locale-root, .shell { background: #07060a !important; }
-  .shell { padding: 0 !important; max-width: none !important; }
+  /* App-like shell: dark background, no padding on the page wrapper */
+  body, .locale-root { background: #07060a; }
+  .shell { background: #07060a !important; padding: 0 !important; max-width: none !important; min-height: 100vh; }
 
-  /* Kill leftover desktop-only chrome on mobile routes */
-  .m-route-mobile-only ~ * .masthead,
-  .m-route-mobile-only ~ * .mission-strip { display: none !important; }
+  /* Kill the route-loader's huge min-height so it doesn't block visibility */
+  .m-route-mobile-only .route-loader { min-height: 200px !important; }
 
   /* ──────────────────────────────────────────────────────────────────
      MOBILE TOP BAR
