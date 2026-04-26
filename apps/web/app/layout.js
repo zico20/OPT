@@ -1,5 +1,4 @@
 import "leaflet/dist/leaflet.css";
-import "react-spring-bottom-sheet/dist/style.css";
 import "./globals.css";
 import { IBM_Plex_Sans, Noto_Sans_Arabic, Sora, Playfair_Display } from "next/font/google";
 

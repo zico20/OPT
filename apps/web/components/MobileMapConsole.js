@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BottomSheet } from "react-spring-bottom-sheet";
+import { Drawer } from "vaul";
 import RiskMapShell from "./RiskMapShell";
 import MobileTopBar from "./MobileTopBar";
 import MobileMapLayerToggles from "./MobileMapLayerToggles";
@@ -33,6 +33,8 @@ function colorFromClass(key) {
   }
 }
 
+const SNAP_POINTS = ["140px", 0.7];
+
 export default function MobileMapConsole({
   districts = [],
   fires = [],
@@ -42,6 +44,7 @@ export default function MobileMapConsole({
   runDate = "-"
 }) {
   const [layers, setLayers] = useState({ districts: true, fires: true });
+  const [snap, setSnap] = useState(SNAP_POINTS[0]);
 
   const top3 = districts.slice(0, 3);
   const lead = top3[0] || null;
@@ -74,62 +77,67 @@ export default function MobileMapConsole({
         />
       </div>
 
-      <BottomSheet
+      <Drawer.Root
         open
-        blocking={false}
-        snapPoints={({ maxHeight }) => [140, Math.round(maxHeight * 0.7)]}
-        defaultSnap={({ snapPoints }) => snapPoints[0]}
-        expandOnContentDrag={false}
-        scrollLocking={false}
+        modal={false}
+        dismissible={false}
+        snapPoints={SNAP_POINTS}
+        activeSnapPoint={snap}
+        setActiveSnapPoint={setSnap}
       >
-        <div className="m-sheet">
-          {/* PEEK SECTION (always visible) */}
-          <div className="m-sheet-peek">
-            <div className="m-live-pill" data-severity={severityKey}>
-              <span className="m-live-pill-icon" aria-hidden="true">{pill.icon}</span>
-              <span className="m-live-pill-text">{pill.label}</span>
-            </div>
+        <Drawer.Portal>
+          <Drawer.Content className="m-sheet-content">
+            <Drawer.Title className="m-sheet-sr-only">Top districts</Drawer.Title>
+            <div className="m-sheet-handle" aria-hidden="true" />
 
-            <div className="m-live-headline">
-              <div className="m-live-district">
-                <strong className="m-live-name">{lead?.district_name || "—"}</strong>
-                <span className="m-live-sub">
-                  {lead?.dominant_risk_class || "—"}
-                  {lead?.hotspot_count_24h > 0 ? ` · ${lead.hotspot_count_24h} hotspot${lead.hotspot_count_24h === 1 ? "" : "s"}` : ""}
-                </span>
-              </div>
-              <div className="m-live-badge" style={{ backgroundColor: leadColor }} data-class={leadProbClass}>
-                <span className="m-live-badge-num">{probDisplay}</span>
-                <span className="m-live-badge-label">prob</span>
-              </div>
-            </div>
-          </div>
+            <div className="m-sheet">
+              <div className="m-sheet-peek">
+                <div className="m-live-pill" data-severity={severityKey}>
+                  <span className="m-live-pill-icon" aria-hidden="true">{pill.icon}</span>
+                  <span className="m-live-pill-text">{pill.label}</span>
+                </div>
 
-          {/* EXPANDED SECTION (revealed when sheet is dragged up) */}
-          <div className="m-sheet-list">
-            <h3 className="m-sheet-list-title">Top 3 districts</h3>
-            {top3.map((d, i) => {
-              const cls = classFromProb(Number(d.max_fire_prob || 0));
-              const color = colorFromClass(cls);
-              return (
-                <div className="m-sheet-item" key={d.district_id || i} data-rank={i + 1}>
-                  <div className="m-sheet-item-rank" style={{ backgroundColor: color }}>
-                    {i + 1}
+                <div className="m-live-headline">
+                  <div className="m-live-district">
+                    <strong className="m-live-name">{lead?.district_name || "—"}</strong>
+                    <span className="m-live-sub">
+                      {lead?.dominant_risk_class || "—"}
+                      {lead?.hotspot_count_24h > 0 ? ` · ${lead.hotspot_count_24h} hotspot${lead.hotspot_count_24h === 1 ? "" : "s"}` : ""}
+                    </span>
                   </div>
-                  <div className="m-sheet-item-body">
-                    <strong className="m-sheet-item-name">{d.district_name}</strong>
-                    <span className="m-sheet-item-class">{d.dominant_risk_class || "—"}</span>
-                  </div>
-                  <div className="m-sheet-item-prob">
-                    <span className="m-sheet-item-prob-num">{Number(d.max_fire_prob || 0).toFixed(2)}</span>
-                    <span className="m-sheet-item-prob-label">prob</span>
+                  <div className="m-live-badge" style={{ backgroundColor: leadColor }} data-class={leadProbClass}>
+                    <span className="m-live-badge-num">{probDisplay}</span>
+                    <span className="m-live-badge-label">prob</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </BottomSheet>
+              </div>
+
+              <div className="m-sheet-list">
+                <h3 className="m-sheet-list-title">Top 3 districts</h3>
+                {top3.map((d, i) => {
+                  const cls = classFromProb(Number(d.max_fire_prob || 0));
+                  const color = colorFromClass(cls);
+                  return (
+                    <div className="m-sheet-item" key={d.district_id || i} data-rank={i + 1}>
+                      <div className="m-sheet-item-rank" style={{ backgroundColor: color }}>
+                        {i + 1}
+                      </div>
+                      <div className="m-sheet-item-body">
+                        <strong className="m-sheet-item-name">{d.district_name}</strong>
+                        <span className="m-sheet-item-class">{d.dominant_risk_class || "—"}</span>
+                      </div>
+                      <div className="m-sheet-item-prob">
+                        <span className="m-sheet-item-prob-num">{Number(d.max_fire_prob || 0).toFixed(2)}</span>
+                        <span className="m-sheet-item-prob-label">prob</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
     </div>
   );
 }

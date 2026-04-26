@@ -37,8 +37,7 @@ const nextConfig = {
   serverExternalPackages: [
     "leaflet",
     "react-leaflet",
-    "@supabase/supabase-js",
-    "react-spring-bottom-sheet"
+    "@supabase/supabase-js"
   ],
   poweredByHeader: false,
   async headers() {
