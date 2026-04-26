@@ -29,6 +29,10 @@ const nextConfig = {
   experimental: {
     externalDir: true
   },
+  // Leaflet & react-leaflet touch `window` at import time. Keep them
+  // outside the server bundle so Next.js dev doesn't choke generating
+  // a vendor chunk for them on the server.
+  serverExternalPackages: ["leaflet", "react-leaflet"],
   poweredByHeader: false,
   async headers() {
     return [
