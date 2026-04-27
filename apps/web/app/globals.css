@@ -5995,6 +5995,55 @@ form,
 
   .m-about-credits { background: rgba(20, 18, 24, 0.4); }
 
+  /* Methodology-specific tweaks (reuses .m-about-* shell) */
+  .m-method-hero { padding-top: 12px; }
+  .m-method-title {
+    font-size: 1.55rem;
+    line-height: 1.15;
+  }
+
+  .m-method-list {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .m-method-list-item {
+    position: relative;
+    padding-left: 16px;
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.78);
+    line-height: 1.5;
+  }
+
+  .m-method-list-item::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 9px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ff8a3d;
+  }
+
+  /* Section accents — left border colored by tone */
+  .m-method-card[data-tone="info"]    { border-left: 3px solid rgba(78, 193, 255, 0.5); }
+  .m-method-card[data-tone="ok"]      { border-left: 3px solid rgba(132, 231, 169, 0.5); }
+  .m-method-card[data-tone="warning"] { border-left: 3px solid rgba(255, 138, 61, 0.6); }
+
+  .m-method-note {
+    background: rgba(20, 18, 24, 0.4);
+    border-left: 3px solid rgba(255, 255, 255, 0.18);
+  }
+
+  /* RTL: flip bullet position */
+  .rtl .m-method-list-item { padding-left: 0; padding-right: 16px; }
+  .rtl .m-method-list-item::before { left: auto; right: 4px; }
+
   /* ──────────────────────────────────────────────────────────────────
      MORE TAB
      ────────────────────────────────────────────────────────────────── */

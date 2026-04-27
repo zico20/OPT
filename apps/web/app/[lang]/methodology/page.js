@@ -1,6 +1,7 @@
 ﻿import StickyMissionStrip from "../../../components/StickyMissionStrip";
 import PublicTopNav from "../../../components/PublicTopNav";
 import MissionStatus from "../../../components/MissionStatus";
+import MobileMethodologyContent from "../../../components/MobileMethodologyContent";
 import { getActiveFireDaily, getAlertEvents, getLatestRun } from "../../../lib/data";
 import { getMessages, normalizeLocale } from "../../../lib/i18n";
 import { deriveMissionState } from "../../../lib/mission";
@@ -22,6 +23,15 @@ export default async function MethodologyPage({ params }) {
 
   return (
     <div className={shellClass} dir={messages.dir}>
+      <div className="m-route-mobile-only">
+        <MobileMethodologyContent
+          locale={locale}
+          messages={messages}
+          runDate={latestRun?.run_date || "-"}
+        />
+      </div>
+
+      <div className="m-route-desktop-only">
       <header className="masthead mission-header">
         <PublicTopNav locale={locale} messages={messages} currentPath="/methodology" />
 
@@ -76,6 +86,7 @@ export default async function MethodologyPage({ params }) {
         <h3>{messages.methodology.noteTitle}</h3>
         <p className="footnote">{messages.common.decisionSupport}</p>
       </section>
+      </div>
     </div>
   );
 }
