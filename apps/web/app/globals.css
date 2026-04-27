@@ -6158,25 +6158,43 @@ form,
   }
 
   .m-more-lang-btn {
-    padding: 10px 8px;
+    /* Strip every native button style that iOS Safari injects */
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    filter: none !important;
     border: 0;
-    background: transparent;
+    padding: 10px 8px;
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.78rem;
     font-weight: 700;
+    font-family: inherit;
     border-radius: 10px;
     cursor: pointer;
-    transition: background 150ms ease, color 150ms ease;
+    transition: background-color 150ms ease, color 150ms ease;
     -webkit-tap-highlight-color: transparent;
     outline: none;
   }
-  .m-more-lang-btn:focus { outline: none; }
+  .m-more-lang-btn:hover,
+  .m-more-lang-btn:active,
+  .m-more-lang-btn:focus {
+    outline: none;
+    background: transparent !important;
+    background-color: transparent !important;
+  }
   .m-more-lang-btn:focus-visible {
     outline: 2px solid rgba(255, 138, 61, 0.5);
     outline-offset: -2px;
   }
-  .m-more-lang-btn.active {
-    background: rgba(255, 138, 61, 0.18);
+  .m-more-lang-btn.active,
+  .m-more-lang-btn.active:hover,
+  .m-more-lang-btn.active:active,
+  .m-more-lang-btn.active:focus {
+    background: rgba(255, 138, 61, 0.18) !important;
+    background-color: rgba(255, 138, 61, 0.18) !important;
     color: #ff8a3d;
   }
 
