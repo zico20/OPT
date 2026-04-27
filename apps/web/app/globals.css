@@ -5372,11 +5372,7 @@ form,
   }
   .m-bnav-item.active .m-bnav-icon { transform: scale(1.08); }
 
-  /* Primary tab (Live, in the middle) — slightly elevated */
-  .m-bnav-primary {
-    background: linear-gradient(180deg, rgba(255, 138, 61, 0.2) 0%, rgba(255, 95, 31, 0.1) 100%);
-    color: #ff8a3d;
-  }
+  /* Primary tab (Live, in the middle) — only stands out when active */
   .m-bnav-primary.active {
     background: linear-gradient(180deg, #ff5f1f 0%, #ff3131 100%);
     color: #fff;
