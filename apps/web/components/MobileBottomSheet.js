@@ -64,14 +64,12 @@ export default function MobileBottomSheet({ peek, children }) {
       style={{ height: height + "px" }}
       role="dialog"
       aria-label="Top districts"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onTouchCancel={onTouchEnd}
     >
-      <div
-        className="m-sheet-handle-area"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-        onTouchCancel={onTouchEnd}
-      >
+      <div className="m-sheet-handle-area">
         <div className="m-sheet-handle" aria-hidden="true" />
       </div>
       <div className="m-sheet-body">

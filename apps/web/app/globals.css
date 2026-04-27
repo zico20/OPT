@@ -5525,6 +5525,10 @@ form,
     color: #fff;
     overflow: hidden;
     transition: height 280ms cubic-bezier(0.32, 0.72, 0, 1);
+    /* Drag works from anywhere on the sheet — disable native gestures */
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .m-sheet-shell.dragging {
@@ -5536,13 +5540,8 @@ form,
     padding: 10px 0 6px;
     display: flex;
     justify-content: center;
-    cursor: grab;
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
+    pointer-events: none; /* purely visual — drag is on the shell */
   }
-
-  .m-sheet-handle-area:active { cursor: grabbing; }
 
   .m-sheet-handle {
     width: 42px;
@@ -5560,9 +5559,7 @@ form,
   .m-sheet-body {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    overflow: hidden;
   }
 
   .m-sheet-peek {
