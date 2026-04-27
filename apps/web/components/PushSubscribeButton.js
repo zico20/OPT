@@ -82,23 +82,35 @@ export default function PushSubscribeButton() {
     }
   };
 
-  if (state === "unsupported" || !vapidKey) return null;
-
   const isOn = state === "subscribed";
+  const isReady = state !== "unsupported" && !!vapidKey;
+  const isDisabled = state === "loading" || !isReady;
+
+  let label;
+  if (state === "loading") label = "...";
+  else if (isOn) label = "Alerts On";
+  else if (state === "unsupported") label = "Unsupported";
+  else if (!vapidKey) label = "Unavailable";
+  else label = "Alerts";
+
+  let title;
+  if (state === "unsupported") title = "Push notifications are not supported in this browser";
+  else if (!vapidKey) title = "Push notifications are not configured on this server";
+  else if (isOn) title = "Disable push alerts";
+  else title = "Enable push alerts";
+
   return (
     <button
       type="button"
       className={["push-subscribe-btn", isOn ? "push-active" : ""].filter(Boolean).join(" ")}
-      onClick={isOn ? unsubscribe : subscribe}
-      disabled={state === "loading"}
-      title={isOn ? "Disable push alerts" : "Enable push alerts"}
+      onClick={isReady ? (isOn ? unsubscribe : subscribe) : undefined}
+      disabled={isDisabled}
+      title={title}
     >
       <span className="push-icon">
         <MicroIcon name={isOn ? "bell" : "bell-off"} />
       </span>
-      <span className="push-label">
-        {isOn ? "Alerts On" : state === "loading" ? "..." : "Alerts"}
-      </span>
+      <span className="push-label">{label}</span>
     </button>
   );
 }
