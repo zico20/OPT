@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const PEEK_HEIGHT = 124;
+const PEEK_HEIGHT = 108;
 const EXPANDED_RATIO = 0.7;
 const SNAP_THRESHOLD = 60; // px the user must drag past to snap
 

@@ -5575,6 +5575,13 @@ form,
 
   .m-sheet-rest {
     padding: 0 14px 14px;
+    transition: opacity 200ms ease;
+  }
+
+  /* Hide the top-3 list while the sheet is collapsed; reveal once expanded */
+  .m-sheet-shell.peek .m-sheet-rest {
+    opacity: 0;
+    pointer-events: none;
   }
 
   /* Sheet content layout */
