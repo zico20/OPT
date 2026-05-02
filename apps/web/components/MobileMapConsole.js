@@ -33,6 +33,10 @@ function fmtPct(value) {
   return Math.round(v) + "%";
 }
 
+function fmtMaxProb(value) {
+  return Math.round(Number(value || 0) * 100) + "%";
+}
+
 export default function MobileMapConsole({
   districts = [],
   fires = [],
@@ -49,7 +53,7 @@ export default function MobileMapConsole({
   const leadClassKey = classKey(lead?.dominant_risk_class);
   const leadColor = colorFromClass(leadClassKey);
   const severityKey = (lead?.operational_severity || missionState || "monitoring").toLowerCase();
-  const highRiskDisplay = fmtPct(lead?.high_or_very_high_area_pct);
+  const peakDisplay = fmtMaxProb(lead?.max_fire_prob);
 
   const visibleDistricts = layers.districts ? districts : [];
   const visibleFires = layers.fires ? fires : [];
@@ -64,8 +68,8 @@ export default function MobileMapConsole({
         </span>
       </div>
       <div className="m-live-badge" style={{ backgroundColor: leadColor }} data-class={leadClassKey}>
-        <span className="m-live-badge-num">{highRiskDisplay}</span>
-        <span className="m-live-badge-label">Risk %</span>
+        <span className="m-live-badge-num">{peakDisplay}</span>
+        <span className="m-live-badge-label">Max %</span>
       </div>
     </div>
   );
@@ -105,8 +109,8 @@ export default function MobileMapConsole({
                   <span className="m-sheet-item-class">{d.dominant_risk_class || "—"}</span>
                 </div>
                 <div className="m-sheet-item-prob">
-                  <span className="m-sheet-item-prob-num">{fmtPct(d.high_or_very_high_area_pct)}</span>
-                  <span className="m-sheet-item-prob-label">Risk %</span>
+                  <span className="m-sheet-item-prob-num">{fmtMaxProb(d.max_fire_prob)}</span>
+                  <span className="m-sheet-item-prob-label">Max %</span>
                 </div>
               </div>
             );
