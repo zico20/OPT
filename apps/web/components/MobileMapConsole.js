@@ -42,6 +42,21 @@ function fmtMaxProb(value) {
   return Math.round(Number(value || 0) * 100) + "%";
 }
 
+// Derive class label from max_fire_prob using the same break thresholds as the
+// classifier (config.eeClassBreak1..4 = 0.2, 0.4, 0.6, 0.8). The mobile UI
+// shows max_fire_prob as its headline number, so the class label next to it
+// must be derived from the same value — otherwise users see contradictions
+// like "Very Low · 87% Max" because dominant_risk_class is the *mode* across
+// pixels while max_fire_prob is the single hottest pixel.
+function classFromMaxProb(prob) {
+  const p = Number(prob || 0);
+  if (p < 0.2) return "Very Low";
+  if (p < 0.4) return "Low";
+  if (p < 0.6) return "Medium";
+  if (p < 0.8) return "High";
+  return "Very High";
+}
+
 export default function MobileMapConsole({
   districts = [],
   fires = [],
@@ -60,7 +75,8 @@ export default function MobileMapConsole({
     .sort((a, b) => Number(b.max_fire_prob ?? 0) - Number(a.max_fire_prob ?? 0))
     .slice(0, 5);
   const lead = topN[0] || null;
-  const leadClassKey = classKey(lead?.dominant_risk_class);
+  const leadPeakClass = classFromMaxProb(lead?.max_fire_prob);
+  const leadClassKey = classKey(leadPeakClass);
   const leadColor = colorFromClass(leadClassKey);
   const severityKey = (lead?.operational_severity || missionState || "monitoring").toLowerCase();
   const peakDisplay = fmtMaxProb(lead?.max_fire_prob);
@@ -73,7 +89,7 @@ export default function MobileMapConsole({
       <div className="m-live-district">
         <strong className="m-live-name">{lead?.district_name || "—"}</strong>
         <span className="m-live-sub">
-          {lead?.dominant_risk_class || "—"}
+          {lead ? leadPeakClass : "—"}
           {lead?.hotspot_count_24h > 0 ? ` · ${lead.hotspot_count_24h} hotspot${lead.hotspot_count_24h === 1 ? "" : "s"}` : ""}
         </span>
       </div>
@@ -116,7 +132,7 @@ export default function MobileMapConsole({
                 </div>
                 <div className="m-sheet-item-body">
                   <strong className="m-sheet-item-name">{d.district_name}</strong>
-                  <span className="m-sheet-item-class">{d.dominant_risk_class || "—"}</span>
+                  <span className="m-sheet-item-class">{classFromMaxProb(d.max_fire_prob)}</span>
                 </div>
                 <div className="m-sheet-item-prob">
                   <span className="m-sheet-item-prob-num">{fmtMaxProb(d.max_fire_prob)}</span>
