@@ -5280,38 +5280,6 @@ form,
     gap: 6px;
   }
 
-  /* Layer toggles in topbar (Live tab) */
-  .m-layer-toggles {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .m-layer-btn {
-    width: 30px;
-    height: 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.4);
-    cursor: pointer;
-    padding: 0;
-    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .m-layer-btn .micro-icon { width: 16px; height: 16px; }
-  .m-layer-btn .micro-icon svg { width: 100%; height: 100%; }
-
-  .m-layer-btn.active {
-    background: rgba(255, 138, 61, 0.18);
-    border-color: rgba(255, 138, 61, 0.4);
-    color: #ff8a3d;
-  }
-
   .m-topbar-scale {
     margin-top: 6px;
     display: flex;
