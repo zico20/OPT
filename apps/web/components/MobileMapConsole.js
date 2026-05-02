@@ -48,7 +48,12 @@ export default function MobileMapConsole({
 }) {
   const [layers, setLayers] = useState({ districts: true, fires: true });
 
-  const top3 = districts.slice(0, 3);
+  // Mobile shows "Max %" as the headline metric, so order Top 3 by it directly
+  // (the desktop leaderboard keeps the operational-priority sort because it
+  // has explicit columns for each metric).
+  const top3 = [...districts]
+    .sort((a, b) => Number(b.max_fire_prob ?? 0) - Number(a.max_fire_prob ?? 0))
+    .slice(0, 3);
   const lead = top3[0] || null;
   const leadClassKey = classKey(lead?.dominant_risk_class);
   const leadColor = colorFromClass(leadClassKey);
