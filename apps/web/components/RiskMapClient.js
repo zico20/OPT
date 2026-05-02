@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CircleMarker, MapContainer, Popup, TileLayer, WMSTileLayer, ZoomControl } from "react-leaflet";
-import { formatPercent, formatProb, riskBadgeTone, severityColor } from "../lib/format";
+import { classFromMaxProb, formatPercent, formatProb, riskBadgeTone, severityColor } from "../lib/format";
 import { localizeRiskClass } from "../lib/i18n";
 
 const DEFAULT_CENTER = [36.9, 30.7];
@@ -55,13 +55,15 @@ export default function RiskMapClient({ districts, fires, messages, locale = "en
             attribution="© EFFIS / JRC"
           />
         )}
-        {districts.map((district) => (
+        {districts.map((district) => {
+          const peakClass = classFromMaxProb(district.max_fire_prob);
+          return (
           <CircleMarker
             key={district.district_id}
             center={[district.lat, district.lon]}
             pathOptions={{
-              color: riskColor(district.dominant_risk_class),
-              fillColor: riskColor(district.dominant_risk_class),
+              color: riskColor(peakClass),
+              fillColor: riskColor(peakClass),
               fillOpacity: 0.88,
               weight: 2,
               opacity: 0.92
@@ -71,8 +73,8 @@ export default function RiskMapClient({ districts, fires, messages, locale = "en
             <Popup className="ops-popup" closeButton={false}>
               <div className="map-popup">
                 <div className="map-popup-header">
-                  <span className={["badge", riskBadgeTone(district.dominant_risk_class)].join(" ")}>
-                    {localizeRiskClass(district.dominant_risk_class, locale)}
+                  <span className={["badge", riskBadgeTone(peakClass)].join(" ")}>
+                    {localizeRiskClass(peakClass, locale)}
                   </span>
                   <strong>{district.district_name}</strong>
                 </div>
@@ -93,7 +95,8 @@ export default function RiskMapClient({ districts, fires, messages, locale = "en
               </div>
             </Popup>
           </CircleMarker>
-        ))}
+          );
+        })}
         {fires.map((fire) => (
           <CircleMarker
             key={fire.fire_id}

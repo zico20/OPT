@@ -48,3 +48,17 @@ export function severityColor(severity) {
   }
   return "#14b8a6";
 }
+
+// Class label derived from max_fire_prob using the same break thresholds the
+// classifier uses (0.2, 0.4, 0.6, 0.8). Use this whenever a UI surface shows
+// max_fire_prob as its headline number — otherwise dominant_risk_class can
+// disagree with the percent (e.g. "Very Low · 87% Max") because dominant_class
+// is the *mode* across pixels while max_fire_prob is the single hottest pixel.
+export function classFromMaxProb(prob) {
+  const p = Number(prob || 0);
+  if (p < 0.2) return "Very Low";
+  if (p < 0.4) return "Low";
+  if (p < 0.6) return "Medium";
+  if (p < 0.8) return "High";
+  return "Very High";
+}

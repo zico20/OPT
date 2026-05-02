@@ -6,6 +6,7 @@ import MobileTopBar from "./MobileTopBar";
 import MobileMapLayerToggles from "./MobileMapLayerToggles";
 import MobileBottomSheet from "./MobileBottomSheet";
 import MobileWeatherFloats from "./MobileWeatherFloats";
+import { classFromMaxProb } from "../lib/format";
 
 function colorFromClass(key) {
   switch (key) {
@@ -40,21 +41,6 @@ function fmtPct(value) {
 
 function fmtMaxProb(value) {
   return Math.round(Number(value || 0) * 100) + "%";
-}
-
-// Derive class label from max_fire_prob using the same break thresholds as the
-// classifier (config.eeClassBreak1..4 = 0.2, 0.4, 0.6, 0.8). The mobile UI
-// shows max_fire_prob as its headline number, so the class label next to it
-// must be derived from the same value — otherwise users see contradictions
-// like "Very Low · 87% Max" because dominant_risk_class is the *mode* across
-// pixels while max_fire_prob is the single hottest pixel.
-function classFromMaxProb(prob) {
-  const p = Number(prob || 0);
-  if (p < 0.2) return "Very Low";
-  if (p < 0.4) return "Low";
-  if (p < 0.6) return "Medium";
-  if (p < 0.8) return "High";
-  return "Very High";
 }
 
 export default function MobileMapConsole({
