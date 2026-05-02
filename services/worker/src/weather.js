@@ -29,6 +29,29 @@ function calcRiskModifier({ tempC, humidity, windKmh }) {
   return Math.min(2.0, Math.max(0.5, Math.round(modifier * 100) / 100));
 }
 
+async function fetchOpenMeteoOnce(url, timeoutMs) {
+  const response = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+  if (!response.ok) {
+    throw new Error(`Open-Meteo: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
+
+async function fetchOpenMeteoWithRetry(url, { attempts = 2, timeoutMs = 25_000, backoffMs = 3_000 } = {}) {
+  let lastError;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fetchOpenMeteoOnce(url, timeoutMs);
+    } catch (err) {
+      lastError = err;
+      if (i < attempts - 1) {
+        await new Promise((r) => setTimeout(r, backoffMs));
+      }
+    }
+  }
+  throw lastError;
+}
+
 export async function fetchRegionWeather({ lat, lon }) {
   // Open-Meteo: free, no API key required
   const url =
@@ -38,12 +61,7 @@ export async function fetchRegionWeather({ lat, lon }) {
     `&daily=temperature_2m_max,relative_humidity_2m_min,wind_speed_10m_max,weather_code` +
     `&timezone=auto&forecast_days=2`;
 
-  const response = await fetch(url, { signal: AbortSignal.timeout(15_000) });
-  if (!response.ok) {
-    throw new Error(`Open-Meteo: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
+  const data = await fetchOpenMeteoWithRetry(url);
   const curr = data.current || {};
   const daily = data.daily || {};
 
