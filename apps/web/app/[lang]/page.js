@@ -93,6 +93,7 @@ export default async function DashboardPage({ params }) {
           activeFireDistricts={activeFireDistricts}
           peakProbability={peakProbability}
           runDate={runDate}
+          weather={weather}
         />
       </div>
 

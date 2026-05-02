@@ -5,6 +5,7 @@ import RiskMapShell from "./RiskMapShell";
 import MobileTopBar from "./MobileTopBar";
 import MobileMapLayerToggles from "./MobileMapLayerToggles";
 import MobileBottomSheet from "./MobileBottomSheet";
+import MobileWeatherFloats from "./MobileWeatherFloats";
 
 function colorFromClass(key) {
   switch (key) {
@@ -38,7 +39,8 @@ export default function MobileMapConsole({
   messages,
   locale = "en",
   missionState = "monitoring",
-  runDate = "-"
+  runDate = "-",
+  weather = null
 }) {
   const [layers, setLayers] = useState({ districts: true, fires: true });
 
@@ -88,7 +90,7 @@ export default function MobileMapConsole({
         />
       </div>
 
-      <MobileBottomSheet peek={peek}>
+      <MobileBottomSheet peek={peek} above={<MobileWeatherFloats weather={weather} />}>
         <div className="m-sheet-list">
           <h3 className="m-sheet-list-title">Top 3 districts</h3>
           {top3.map((d, i) => {

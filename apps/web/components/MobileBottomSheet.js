@@ -6,7 +6,7 @@ const PEEK_HEIGHT = 108;
 const EXPANDED_RATIO = 0.7;
 const SNAP_THRESHOLD = 60; // px the user must drag past to snap
 
-export default function MobileBottomSheet({ peek, children }) {
+export default function MobileBottomSheet({ peek, children, above = null }) {
   const [vh, setVh] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [dragDy, setDragDy] = useState(0);
@@ -85,21 +85,37 @@ export default function MobileBottomSheet({ peek, children }) {
   if (height < PEEK_HEIGHT) height = PEEK_HEIGHT;
   if (height > expandedHeight) height = expandedHeight;
 
+  // The sheet is anchored at bottom: 92px (above the bottom nav). The "above"
+  // slot floats just over the sheet's top edge, so its bottom from the viewport
+  // is the sheet's bottom (92px) + the sheet's current height + a small gap.
+  const aboveBottom = 92 + height + 8;
+
   return (
-    <div
-      ref={shellRef}
-      className={["m-sheet-shell", expanded ? "expanded" : "peek", dragging ? "dragging" : ""].filter(Boolean).join(" ")}
-      style={{ height: height + "px" }}
-      role="dialog"
-      aria-label="Top districts"
-    >
-      <div className="m-sheet-handle-area">
-        <div className="m-sheet-handle" aria-hidden="true" />
+    <>
+      {above && (
+        <div
+          className={["m-sheet-above", expanded ? "expanded" : "peek", dragging ? "dragging" : ""].filter(Boolean).join(" ")}
+          style={{ bottom: aboveBottom + "px" }}
+          aria-hidden={expanded || undefined}
+        >
+          {above}
+        </div>
+      )}
+      <div
+        ref={shellRef}
+        className={["m-sheet-shell", expanded ? "expanded" : "peek", dragging ? "dragging" : ""].filter(Boolean).join(" ")}
+        style={{ height: height + "px" }}
+        role="dialog"
+        aria-label="Top districts"
+      >
+        <div className="m-sheet-handle-area">
+          <div className="m-sheet-handle" aria-hidden="true" />
+        </div>
+        <div className="m-sheet-body">
+          <div className="m-sheet-peek">{peek}</div>
+          <div className="m-sheet-rest">{children}</div>
+        </div>
       </div>
-      <div className="m-sheet-body">
-        <div className="m-sheet-peek">{peek}</div>
-        <div className="m-sheet-rest">{children}</div>
-      </div>
-    </div>
+    </>
   );
 }
