@@ -1,0 +1,10 @@
+[Unit]
+Description=Run Fire Risk Hourly Weather Refresh (Open-Meteo, free, no API key)
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+Unit=fire-risk-weather-run.service
+
+[Install]
+WantedBy=timers.target

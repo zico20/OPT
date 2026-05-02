@@ -29,6 +29,7 @@ chmod +x "$REPO_ROOT/scripts/start-worker-prod.sh"
 chmod +x "$REPO_ROOT/scripts/run-daily-export.sh"
 chmod +x "$REPO_ROOT/scripts/run-daily-worker.sh"
 chmod +x "$REPO_ROOT/scripts/run-daily-pipeline.sh"
+chmod +x "$REPO_ROOT/scripts/run-weather.sh"
 chmod +x "$REPO_ROOT/scripts/healthcheck.sh"
 chmod +x "$REPO_ROOT/scripts/verify-systemd.sh"
 
@@ -52,11 +53,16 @@ render_unit \
 render_unit \
   "$REPO_ROOT/deploy/systemd/fire-risk-daily-run.service" \
   "$TMP_DIR/fire-risk-daily-run.service"
+render_unit \
+  "$REPO_ROOT/deploy/systemd/fire-risk-weather-run.service" \
+  "$TMP_DIR/fire-risk-weather-run.service"
 
 sudo cp "$TMP_DIR/fire-risk-web.service" "$SYSTEMD_DIR/"
 sudo cp "$TMP_DIR/fire-risk-worker.service" "$SYSTEMD_DIR/"
 sudo cp "$TMP_DIR/fire-risk-daily-run.service" "$SYSTEMD_DIR/"
 sudo cp "$REPO_ROOT/deploy/systemd/fire-risk-daily-run.timer" "$SYSTEMD_DIR/"
+sudo cp "$TMP_DIR/fire-risk-weather-run.service" "$SYSTEMD_DIR/"
+sudo cp "$REPO_ROOT/deploy/systemd/fire-risk-weather-run.timer" "$SYSTEMD_DIR/"
 
 echo "Reloading systemd..."
 sudo systemctl daemon-reload
@@ -65,16 +71,18 @@ echo "Enabling services..."
 sudo systemctl enable fire-risk-web.service
 sudo systemctl enable fire-risk-worker.service
 sudo systemctl enable fire-risk-daily-run.timer
+sudo systemctl enable fire-risk-weather-run.timer
 
 echo "Starting services..."
 sudo systemctl restart fire-risk-web.service
 sudo systemctl restart fire-risk-worker.service
 sudo systemctl restart fire-risk-daily-run.timer
+sudo systemctl restart fire-risk-weather-run.timer
 
 echo "Systemd installation completed."
 echo
 echo "Current service status:"
-sudo systemctl --no-pager --lines=0 status fire-risk-web.service fire-risk-worker.service fire-risk-daily-run.timer || true
+sudo systemctl --no-pager --lines=0 status fire-risk-web.service fire-risk-worker.service fire-risk-daily-run.timer fire-risk-weather-run.timer || true
 echo
-echo "Next timer run:"
-sudo systemctl list-timers fire-risk-daily-run.timer --no-pager || true
+echo "Next timer runs:"
+sudo systemctl list-timers fire-risk-daily-run.timer fire-risk-weather-run.timer --no-pager || true

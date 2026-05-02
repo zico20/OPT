@@ -5,6 +5,7 @@
     "scripts":  {
                     "start":  "node src/server.js",
                     "run:daily":  "node src/runDaily.js",
+                    "run:weather":  "node src/runWeather.js",
                     "test":  "node --test src/alertRules.test.js",
                     "run:export":  "node src/exportDailyAssets.js"
                 },
