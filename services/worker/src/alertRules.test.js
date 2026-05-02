@@ -6,6 +6,8 @@ import {
   buildTelegramMessage,
   hasEscalated,
   buildDigestMessage,
+  buildStateAwareDigest,
+  highestSeverity,
   buildCriticalMessage,
   escapeHtml
 } from "./alertRules.js";
@@ -80,6 +82,37 @@ test("buildCriticalMessage includes district, probability and dashboard link", (
   assert.match(msg, /Manavgat/);
   assert.match(msg, /0\.91/);
   assert.match(msg, /hazardsignal\.com/);
+});
+
+test("highestSeverity picks the strongest of a mixed list", () => {
+  assert.equal(highestSeverity([{ severity: "Watch" }, { severity: "Critical" }, { severity: "Warning" }]), "Critical");
+  assert.equal(highestSeverity([{ severity: "Watch" }, { severity: "Warning" }]), "Warning");
+  assert.equal(highestSeverity([]), null);
+});
+
+test("buildStateAwareDigest tailors hook + button to severity", () => {
+  const url = "https://hazardsignal.com";
+
+  const calm = buildStateAwareDigest({ alerts: [], cleared: [{ district: { district_name: "Demre" } }], appUrl: url });
+  assert.match(calm.text, /calm today/);
+  assert.match(calm.text, /Tap to confirm/);
+  assert.equal(calm.replyMarkup.inline_keyboard[0][0].text, "Open dashboard");
+  assert.equal(calm.replyMarkup.inline_keyboard[0][0].url, url);
+
+  const watch = buildStateAwareDigest({ alerts: [{ severity: "Watch" }], appUrl: url });
+  assert.match(watch.text, /eyes today/);
+
+  const warning = buildStateAwareDigest({ alerts: [{ severity: "Watch" }, { severity: "Warning" }], appUrl: url });
+  assert.match(warning.text, /Warning issued/);
+
+  const critical = buildStateAwareDigest({ alerts: [{ severity: "Warning" }, { severity: "Critical" }], appUrl: url });
+  assert.match(critical.text, /Critical fire risk/);
+  assert.match(critical.text, /Open immediately/);
+});
+
+test("buildStateAwareDigest omits replyMarkup when no appUrl is given", () => {
+  const result = buildStateAwareDigest({ alerts: [{ severity: "Warning" }] });
+  assert.equal(result.replyMarkup, undefined);
 });
 
 test("buildDigestMessage groups by severity and lists clearings", () => {

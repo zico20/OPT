@@ -2,7 +2,7 @@ import { getConfig } from "./config.js";
 import {
   shouldSendAlert,
   buildTelegramMessage,
-  buildDigestMessage,
+  buildStateAwareDigest,
   buildCriticalMessage,
   hasEscalated
 } from "./alertRules.js";
@@ -122,12 +122,13 @@ async function deliverTelegramAlerts({ runDate, alertEvents, crisisEndedDistrict
     return;
   }
 
-  const send = (chatId, message) => sendTelegramMessage({
+  const send = (chatId, message, replyMarkup) => sendTelegramMessage({
     botToken: config.telegramBotToken,
     chatId,
     message,
     parseMode: "HTML",
-    disableWebPagePreview: true
+    disableWebPagePreview: true,
+    replyMarkup
   }).catch((err) => ({ ok: false, skipped: false, reason: err.message }));
 
   const markStatus = (alerts, ok) => {
@@ -168,8 +169,7 @@ async function deliverTelegramAlerts({ runDate, alertEvents, crisisEndedDistrict
       if (!result.ok) allOk = false;
     }
 
-    const digest = buildDigestMessage({
-      runDate,
+    const { text: digestText, replyMarkup: digestButton } = buildStateAwareDigest({
       alerts: visibleAlerts.map((e) => ({
         severity: e.severity,
         district: e._district,
@@ -178,7 +178,7 @@ async function deliverTelegramAlerts({ runDate, alertEvents, crisisEndedDistrict
       cleared: visibleCleared,
       appUrl: config.publicAppUrl
     });
-    const digestResult = await send(chatId, digest);
+    const digestResult = await send(chatId, digestText, digestButton);
     if (!digestResult.ok) allOk = false;
 
     markStatus(visibleAlerts, allOk);

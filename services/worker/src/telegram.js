@@ -4,7 +4,8 @@ export async function sendTelegramMessage({
   message,
   parseMode,
   disableNotification,
-  disableWebPagePreview
+  disableWebPagePreview,
+  replyMarkup
 }) {
   if (!botToken || !chatId) {
     return {
@@ -21,6 +22,7 @@ export async function sendTelegramMessage({
   if (parseMode) payload.parse_mode = parseMode;
   if (disableNotification) payload.disable_notification = true;
   if (disableWebPagePreview) payload.disable_web_page_preview = true;
+  if (replyMarkup) payload.reply_markup = replyMarkup;
 
   const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",

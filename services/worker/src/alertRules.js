@@ -112,6 +112,72 @@ export function buildCriticalMessage({ runDate, district, triggerReason, appUrl 
 }
 
 /**
+ * Returns the highest severity present in alerts (or null if alerts is empty).
+ * Used to drive the state-aware digest's hook line.
+ */
+export function highestSeverity(alerts = []) {
+  let best = null;
+  let bestRank = 0;
+  for (const a of alerts) {
+    const r = severityRank(a.severity);
+    if (r > bestRank) {
+      bestRank = r;
+      best = a.severity;
+    }
+  }
+  return best;
+}
+
+/**
+ * Hook-style daily digest: short, curiosity-driven, ALL info hidden behind the
+ * dashboard button so subscribers actually open the site instead of treating
+ * the message as the answer.
+ *
+ * Returns { text, replyMarkup } — pass both into sendTelegramMessage.
+ *
+ * Visuals adapt to the highest severity in `alerts`:
+ *   Critical → 🚨 urgent CTA
+ *   Warning  → 🟠 warning CTA
+ *   Watch    → 🟡 awareness CTA
+ *   none     → 🟢 reassurance CTA (still drives a tap to confirm)
+ */
+export function buildStateAwareDigest({ alerts = [], cleared = [], appUrl } = {}) {
+  const severity = highestSeverity(alerts);
+  const url = String(appUrl || "");
+  let headline;
+  let cta;
+
+  if (severity === "Critical") {
+    headline = "🚨 Critical fire risk in Antalya.";
+    cta = "Open immediately →";
+  } else if (severity === "Warning") {
+    headline = "🟠 Warning issued for Antalya.";
+    cta = "Open the risk map →";
+  } else if (severity === "Watch") {
+    headline = "🟡 Antalya needs your eyes today.";
+    cta = "See which districts →";
+  } else if (cleared.length > 0) {
+    headline = "🟢 Antalya is calm today.";
+    cta = "Tap to confirm the all-clear →";
+  } else {
+    headline = "🟢 Antalya is calm today.";
+    cta = "Open today's briefing →";
+  }
+
+  const text = [
+    `<b>${headline}</b>`,
+    ``,
+    cta
+  ].join("\n");
+
+  const replyMarkup = url
+    ? { inline_keyboard: [[{ text: "Open dashboard", url }]] }
+    : undefined;
+
+  return { text, replyMarkup, severity };
+}
+
+/**
  * alerts: [{ severity, district, triggerReason }]
  * cleared: [{ district }]
  */
