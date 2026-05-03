@@ -3,6 +3,7 @@ import {
   shouldSendAlert,
   buildTelegramMessage,
   buildStateAwareDigest,
+  buildStateAwarePush,
   buildCriticalMessage,
   hasEscalated
 } from "./alertRules.js";
@@ -304,22 +305,18 @@ export async function runDaily({ date, exportFirst } = {}) {
     config
   });
 
-  for (const district of crisisEndedDistricts) {
-    await sendWebPushNotifications({
-      title: `\u2705 All Clear — ${district.district_name}`,
-      body: "Fire risk has dropped below the alert threshold.",
-      url: `${config.publicAppUrl}/districts/${district.district_id}`
-    }).catch((err) => console.error("[crisis-ended] Push failed:", err.message));
-  }
-
-  if (alertEvents.length > 0) {
-    const topAlert = alertEvents[0];
-    await sendWebPushNotifications({
-      title: `\ud83d\udd25 Fire Alert — ${topAlert.severity}: ${topAlert.district_name}`,
-      body: topAlert.trigger_reason,
-      url: `${config.publicAppUrl}/districts/${topAlert.district_id}`
-    }).catch((err) => console.error("[push] Alert push failed:", err.message));
-  }
+  // One state-aware push per run -- mirrors the Telegram digest's voice
+  // so both channels surface the same hook ("Antalya is calm today" -> tap
+  // -> dashboard). No per-district spam, no body that leaks the answer.
+  const pushPayload = buildStateAwarePush({
+    alerts: alertEvents.map((e) => ({ severity: e.severity })),
+    cleared: crisisEndedDistricts
+  });
+  await sendWebPushNotifications({
+    title: pushPayload.title,
+    body: pushPayload.body,
+    url: config.publicAppUrl
+  }).catch((err) => console.error("[push] Daily push failed:", err.message));
 
   const persistedAlertEvents = alertEvents.map(({ _district, _escalated, _previousSeverity, ...rest }) => rest);
 

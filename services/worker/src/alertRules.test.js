@@ -7,6 +7,7 @@ import {
   hasEscalated,
   buildDigestMessage,
   buildStateAwareDigest,
+  buildStateAwarePush,
   highestSeverity,
   buildCriticalMessage,
   escapeHtml
@@ -113,6 +114,28 @@ test("buildStateAwareDigest tailors hook + button to severity", () => {
 test("buildStateAwareDigest omits replyMarkup when no appUrl is given", () => {
   const result = buildStateAwareDigest({ alerts: [{ severity: "Warning" }] });
   assert.equal(result.replyMarkup, undefined);
+});
+
+test("buildStateAwarePush returns title + body that mirror digest severity", () => {
+  const calm = buildStateAwarePush({ alerts: [], cleared: [{ district_name: "Demre" }] });
+  assert.match(calm.title, /calm today/);
+  assert.match(calm.body, /Tap to confirm/);
+
+  const watch = buildStateAwarePush({ alerts: [{ severity: "Watch" }] });
+  assert.match(watch.title, /eyes today/);
+
+  const warning = buildStateAwarePush({ alerts: [{ severity: "Watch" }, { severity: "Warning" }] });
+  assert.match(warning.title, /Warning issued/);
+
+  const critical = buildStateAwarePush({ alerts: [{ severity: "Warning" }, { severity: "Critical" }] });
+  assert.match(critical.title, /Critical fire risk/);
+  assert.match(critical.body, /immediately/);
+});
+
+test("buildStateAwarePush quiet-day fallback when there are no alerts and no cleared", () => {
+  const empty = buildStateAwarePush({});
+  assert.match(empty.title, /calm today/);
+  assert.match(empty.body, /briefing/);
 });
 
 test("buildDigestMessage groups by severity and lists clearings", () => {

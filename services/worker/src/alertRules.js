@@ -178,6 +178,31 @@ export function buildStateAwareDigest({ alerts = [], cleared = [], appUrl } = {}
 }
 
 /**
+ * Daily web-push payload that mirrors the Telegram digest's state-aware
+ * voice: a curiosity-driven headline + short CTA that hints without
+ * spoiling, so the tap drives users into the dashboard.
+ *
+ * Returns { title, body }. The caller supplies the URL.
+ */
+export function buildStateAwarePush({ alerts = [], cleared = [] } = {}) {
+  const severity = highestSeverity(alerts);
+
+  if (severity === "Critical") {
+    return { title: "🚨 Critical fire risk in Antalya", body: "Tap to open immediately" };
+  }
+  if (severity === "Warning") {
+    return { title: "🟠 Warning issued for Antalya", body: "Open the risk map →" };
+  }
+  if (severity === "Watch") {
+    return { title: "🟡 Antalya needs your eyes today", body: "See which districts →" };
+  }
+  if (cleared.length > 0) {
+    return { title: "🟢 Antalya is calm today", body: "Tap to confirm the all-clear" };
+  }
+  return { title: "🟢 Antalya is calm today", body: "Open today's briefing →" };
+}
+
+/**
  * alerts: [{ severity, district, triggerReason }]
  * cleared: [{ district }]
  */
