@@ -6,14 +6,81 @@ import { useEffect, useRef, useState } from "react";
 // number of user messages — assistant replies don't count.
 const MAX_USER_TURNS = 5;
 
+// Per-locale UI strings. The visible button label "Ask AI" is intentionally
+// kept English everywhere — it's a brand mark for the feature, not body copy.
+const STRINGS = {
+  en: {
+    intro: "Ask Me Anything About Wildfire Risk Today ..",
+    sub: "5 Questions / day",
+    placeholder: "Ask about a district, fire, or weather…",
+    placeholderLimited: "Daily limit reached",
+    placeholderSessionFull: "Session full — start over",
+    sendAriaLabel: "Send",
+    closeAriaLabel: "Close",
+    resetAriaLabel: "Start over",
+    openAriaLabel: "Open Ask AI",
+    closeBtnAriaLabel: "Close Ask AI",
+    panelAriaLabel: "Ask AI about Antalya wildfire risk",
+    sessionFullNote: "Session full — tap ↻ to start over.",
+    remaining: (n) => <>Remaining today: <strong>{n}</strong></>,
+    dailyLimitReached: "You've reached the 5 questions / day limit. Come back tomorrow, or use the HazardSignal Telegram bot for unlimited briefings.",
+    httpError: "Sorry, the assistant ran into an error. Try again.",
+    networkError: "Network error — could not reach the assistant. Check your connection."
+  },
+  ar: {
+    intro: "اسألني أي شيء عن مخاطر الحرائق اليوم ..",
+    sub: "5 أسئلة في اليوم",
+    placeholder: "اسأل عن منطقة، حريق، أو الطقس…",
+    placeholderLimited: "تم بلوغ الحد اليومي",
+    placeholderSessionFull: "الجلسة ممتلئة — ابدأ من جديد",
+    sendAriaLabel: "إرسال",
+    closeAriaLabel: "إغلاق",
+    resetAriaLabel: "ابدأ من جديد",
+    openAriaLabel: "افتح Ask AI",
+    closeBtnAriaLabel: "أغلق Ask AI",
+    panelAriaLabel: "Ask AI عن مخاطر الحرائق في أنطاليا",
+    sessionFullNote: "الجلسة ممتلئة — اضغط ↻ للبدء من جديد.",
+    remaining: (n) => <>المتبقي اليوم: <strong>{n}</strong></>,
+    dailyLimitReached: "بلغت حد 5 أسئلة في اليوم. ارجع غداً، أو استخدم بوت تيليجرام التابع لـ HazardSignal لتلقي إحاطات بلا حدود.",
+    httpError: "عذراً، حدث خطأ في المساعد. حاول مرة أخرى.",
+    networkError: "خطأ في الشبكة — تعذر الوصول إلى المساعد. تحقق من اتصالك."
+  },
+  tr: {
+    intro: "Bugün Yangın Riski Hakkında Bana Her Şeyi Sor ..",
+    sub: "Günde 5 Soru",
+    placeholder: "Bir ilçe, yangın veya hava durumu hakkında sor…",
+    placeholderLimited: "Günlük limit doldu",
+    placeholderSessionFull: "Oturum dolu — yeniden başla",
+    sendAriaLabel: "Gönder",
+    closeAriaLabel: "Kapat",
+    resetAriaLabel: "Yeniden başla",
+    openAriaLabel: "Ask AI'yı aç",
+    closeBtnAriaLabel: "Ask AI'yı kapat",
+    panelAriaLabel: "Antalya yangın riski hakkında Ask AI",
+    sessionFullNote: "Oturum dolu — yeniden başlamak için ↻ dokun.",
+    remaining: (n) => <>Bugün kalan: <strong>{n}</strong></>,
+    dailyLimitReached: "Günde 5 soru limitine ulaştınız. Yarın geri dönün veya sınırsız özetler için HazardSignal Telegram botunu kullanın.",
+    httpError: "Üzgünüm, asistanda bir hata oluştu. Lütfen tekrar deneyin.",
+    networkError: "Ağ hatası — asistana ulaşılamıyor. Bağlantınızı kontrol edin."
+  }
+};
+
 const SUGGESTED = [
   { en: "What's the riskiest district today?", ar: "أي منطقة الأخطر اليوم؟", tr: "Bugün en riskli ilçe hangisi?" },
-  { en: "Are there active fires right now?", ar: "هل في حرائق نشطة الآن؟", tr: "Şu anda aktif yangın var mı?" },
+  { en: "Are there active fires right now?", ar: "هل توجد حرائق نشطة الآن؟", tr: "Şu anda aktif yangın var mı?" },
   { en: "How will the weather affect tomorrow?", ar: "كيف سيؤثر الجو غداً؟", tr: "Hava yarın nasıl olacak?" },
   { en: "Show me Alanya's recent trend", ar: "أرني اتجاه Alanya الأخير", tr: "Alanya'nın son trendini göster" }
 ];
 
-export default function AskAI() {
+function pickLocale(locale) {
+  const k = String(locale || "en").toLowerCase();
+  if (k === "ar" || k === "tr") return k;
+  return "en";
+}
+
+export default function AskAI({ locale = "en" }) {
+  const lang = pickLocale(locale);
+  const t = STRINGS[lang];
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]); // [{ role, content, action? }]
   const [input, setInput] = useState("");
@@ -50,14 +117,14 @@ export default function AskAI() {
 
       if (res.status === 429) {
         setLimited(true);
-        setMessages((prev) => [...prev, { role: "assistant", content: data.reply || "Daily limit reached." }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: data.reply || t.dailyLimitReached }]);
         return;
       }
 
       if (!res.ok) {
         setMessages((prev) => [...prev, {
           role: "assistant",
-          content: data.reply || "Sorry, the assistant ran into an error. Try again."
+          content: data.reply || t.httpError
         }]);
         return;
       }
@@ -70,7 +137,7 @@ export default function AskAI() {
     } catch (err) {
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: "Network error — could not reach the assistant. Check your connection."
+        content: t.networkError
       }]);
     } finally {
       setBusy(false);
@@ -78,9 +145,9 @@ export default function AskAI() {
   }
 
   function pickSuggestion(s) {
-    // Default to English; Claude auto-detects regardless. The other variants
-    // are there if we later show language-specific hints.
-    send(s.en);
+    // Send the locale-specific variant of the suggestion so Claude responds
+    // in the same language without needing to detect from "What's the…".
+    send(s[lang] || s.en);
   }
 
   function reset() {
@@ -95,14 +162,14 @@ export default function AskAI() {
         type="button"
         className={["m-ask-btn", open ? "open" : ""].filter(Boolean).join(" ")}
         onClick={() => setOpen((v) => !v)}
-        aria-label={open ? "Close Ask AI" : "Open Ask AI"}
+        aria-label={open ? t.closeBtnAriaLabel : t.openAriaLabel}
       >
         <span className="m-ask-btn-icon" aria-hidden="true">✦</span>
         <span className="m-ask-btn-label">Ask AI</span>
       </button>
 
       {open && (
-        <div className="m-ask-panel" role="dialog" aria-label="Ask AI about Antalya wildfire risk">
+        <div className="m-ask-panel" role="dialog" aria-label={t.panelAriaLabel}>
           <header className="m-ask-header">
             <div className="m-ask-title">
               <span className="m-ask-title-icon" aria-hidden="true">✦</span>
@@ -110,17 +177,17 @@ export default function AskAI() {
             </div>
             <div className="m-ask-header-actions">
               {messages.length > 0 && (
-                <button type="button" className="m-ask-icon-btn" onClick={reset} aria-label="Start over">↻</button>
+                <button type="button" className="m-ask-icon-btn" onClick={reset} aria-label={t.resetAriaLabel}>↻</button>
               )}
-              <button type="button" className="m-ask-icon-btn" onClick={() => setOpen(false)} aria-label="Close">✕</button>
+              <button type="button" className="m-ask-icon-btn" onClick={() => setOpen(false)} aria-label={t.closeAriaLabel}>✕</button>
             </div>
           </header>
 
           <div className="m-ask-body" ref={scrollRef}>
             {messages.length === 0 && (
               <div className="m-ask-intro">
-                <p className="m-ask-intro-line">Ask Me Anything About Wildfire Risk Today ..</p>
-                <p className="m-ask-intro-sub">5 Questions / day</p>
+                <p className="m-ask-intro-line">{t.intro}</p>
+                <p className="m-ask-intro-sub">{t.sub}</p>
               </div>
             )}
 
@@ -150,7 +217,7 @@ export default function AskAI() {
                   className="m-ask-suggestion"
                   onClick={() => pickSuggestion(s)}
                 >
-                  {s.en}
+                  {s[lang] || s.en}
                 </button>
               ))}
             </div>
@@ -164,9 +231,9 @@ export default function AskAI() {
               type="text"
               className="m-ask-input"
               placeholder={
-                limited ? "Daily limit reached" :
-                reachedTurnLimit ? "Session full — start over" :
-                "Ask about a district, fire, or weather…"
+                limited ? t.placeholderLimited :
+                reachedTurnLimit ? t.placeholderSessionFull :
+                t.placeholder
               }
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -181,7 +248,7 @@ export default function AskAI() {
                 type="submit"
                 className="m-ask-send"
                 disabled={busy || !input.trim() || reachedTurnLimit || limited}
-                aria-label="Send"
+                aria-label={t.sendAriaLabel}
               >
                 {busy ? "…" : "↑"}
               </button>
@@ -190,10 +257,10 @@ export default function AskAI() {
 
           <div className="m-ask-footnote">
             {remaining !== null && !limited && (
-              <span>Remaining today: <strong>{remaining}</strong></span>
+              <span>{t.remaining(remaining)}</span>
             )}
             {reachedTurnLimit && !limited && (
-              <span>Session full — tap ↻ to start over.</span>
+              <span>{t.sessionFullNote}</span>
             )}
           </div>
         </div>

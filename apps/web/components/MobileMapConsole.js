@@ -97,7 +97,7 @@ export default function MobileMapConsole({
           locale={locale}
           missionState={missionState}
         />
-        <AskAI />
+        <AskAI locale={locale} />
       </div>
 
       <MobileBottomSheet peek={peek} above={<MobileWeatherFloats weather={weather} />}>
