@@ -4,6 +4,7 @@ import RiskMapShell from "./RiskMapShell";
 import MobileTopBar from "./MobileTopBar";
 import MobileBottomSheet from "./MobileBottomSheet";
 import MobileWeatherFloats from "./MobileWeatherFloats";
+import AskAI from "./AskAI";
 import { classFromMaxProb } from "../lib/format";
 
 function colorFromClass(key) {
@@ -96,6 +97,7 @@ export default function MobileMapConsole({
           locale={locale}
           missionState={missionState}
         />
+        <AskAI />
       </div>
 
       <MobileBottomSheet peek={peek} above={<MobileWeatherFloats weather={weather} />}>
