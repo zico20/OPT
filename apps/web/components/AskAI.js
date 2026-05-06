@@ -64,8 +64,7 @@ export default function AskAI() {
 
       setMessages((prev) => [...prev, {
         role: "assistant",
-        content: data.reply || "(empty reply)",
-        action: data.action || null
+        content: data.reply || "(empty reply)"
       }]);
       if (typeof data.remaining === "number") setRemaining(data.remaining);
     } catch (err) {
@@ -128,16 +127,6 @@ export default function AskAI() {
             {messages.map((m, i) => (
               <div key={i} className={`m-ask-msg m-ask-msg-${m.role}`}>
                 <div className="m-ask-msg-bubble">{m.content}</div>
-                {m.action && (
-                  <a
-                    className="m-ask-msg-action"
-                    href={m.action.url}
-                    target={m.action.url.startsWith("http") ? "_blank" : undefined}
-                    rel={m.action.url.startsWith("http") ? "noopener noreferrer" : undefined}
-                  >
-                    {m.action.label} →
-                  </a>
-                )}
               </div>
             ))}
 
