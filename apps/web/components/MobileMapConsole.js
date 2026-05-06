@@ -6,6 +6,22 @@ import MobileBottomSheet from "./MobileBottomSheet";
 import MobileWeatherFloats from "./MobileWeatherFloats";
 import AskAI from "./AskAI";
 import { classFromMaxProb } from "../lib/format";
+import { localizeRiskClass } from "../lib/i18n";
+
+// Per-locale strings for the Live-tab bottom sheet. Risk class names are
+// already localized via lib/i18n's localizeRiskClass; this dict covers the
+// other UI bits (header + metric label).
+const SHEET_STRINGS = {
+  en: { topN: "Top 5 districts", maxLabel: "Max %", hotspot: (n) => `· ${n} hotspot${n === 1 ? "" : "s"}` },
+  ar: { topN: "أعلى 5 مناطق", maxLabel: "النسبة القصوى", hotspot: (n) => `· ${n} نقطة ساخنة` },
+  tr: { topN: "İlk 5 ilçe", maxLabel: "Maks %", hotspot: (n) => `· ${n} sıcak nokta` }
+};
+
+function pickSheetStrings(locale) {
+  const k = String(locale || "en").toLowerCase();
+  if (k === "ar" || k === "tr") return SHEET_STRINGS[k];
+  return SHEET_STRINGS.en;
+}
 
 function colorFromClass(key) {
   switch (key) {
@@ -51,6 +67,8 @@ export default function MobileMapConsole({
   runDate = "-",
   weather = null
 }) {
+  const sheetT = pickSheetStrings(locale);
+
   // Mobile shows "Max %" as the headline metric, so order Top N by it directly
   // (the desktop leaderboard keeps the operational-priority sort because it
   // has explicit columns for each metric).
@@ -69,13 +87,13 @@ export default function MobileMapConsole({
       <div className="m-live-district">
         <strong className="m-live-name">{lead?.district_name || "—"}</strong>
         <span className="m-live-sub">
-          {lead ? leadPeakClass : "—"}
-          {lead?.hotspot_count_24h > 0 ? ` · ${lead.hotspot_count_24h} hotspot${lead.hotspot_count_24h === 1 ? "" : "s"}` : ""}
+          {lead ? localizeRiskClass(leadPeakClass, locale) : "—"}
+          {lead?.hotspot_count_24h > 0 ? ` ${sheetT.hotspot(lead.hotspot_count_24h)}` : ""}
         </span>
       </div>
       <div className="m-live-badge" style={{ backgroundColor: leadColor }} data-class={leadClassKey}>
         <span className="m-live-badge-num">{peakDisplay}</span>
-        <span className="m-live-badge-label">Max %</span>
+        <span className="m-live-badge-label">{sheetT.maxLabel}</span>
       </div>
     </div>
   );
@@ -102,7 +120,7 @@ export default function MobileMapConsole({
 
       <MobileBottomSheet peek={peek} above={<MobileWeatherFloats weather={weather} />}>
         <div className="m-sheet-list">
-          <h3 className="m-sheet-list-title">Top 5 districts</h3>
+          <h3 className="m-sheet-list-title">{sheetT.topN}</h3>
           {topN.map((d, i) => {
             const rankColor = RANK_COLORS[i] || RANK_COLORS[RANK_COLORS.length - 1];
             return (
@@ -112,11 +130,11 @@ export default function MobileMapConsole({
                 </div>
                 <div className="m-sheet-item-body">
                   <strong className="m-sheet-item-name">{d.district_name}</strong>
-                  <span className="m-sheet-item-class">{classFromMaxProb(d.max_fire_prob)}</span>
+                  <span className="m-sheet-item-class">{localizeRiskClass(classFromMaxProb(d.max_fire_prob), locale)}</span>
                 </div>
                 <div className="m-sheet-item-prob">
                   <span className="m-sheet-item-prob-num">{fmtMaxProb(d.max_fire_prob)}</span>
-                  <span className="m-sheet-item-prob-label">Max %</span>
+                  <span className="m-sheet-item-prob-label">{sheetT.maxLabel}</span>
                 </div>
               </div>
             );
