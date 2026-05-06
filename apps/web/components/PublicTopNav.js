@@ -2,8 +2,11 @@ import Link from "next/link";
 import LocaleSwitch from "./LocaleSwitch";
 import TelegramSubscribePanel from "./TelegramSubscribePanel";
 import PushSubscribeButton from "./PushSubscribeButton";
+import AuthMenu from "./AuthMenu";
+import { getCurrentUser } from "../lib/supabase/server";
 
-export default function PublicTopNav({ locale, messages, currentPath = "/" }) {
+export default async function PublicTopNav({ locale, messages, currentPath = "/" }) {
+  const user = await getCurrentUser();
   const links = [
     { href: `/${locale}`, label: messages.nav.dashboard, match: "/" },
     { href: `/${locale}/alerts`, label: messages.nav.alerts, match: "/alerts" },
@@ -36,6 +39,7 @@ export default function PublicTopNav({ locale, messages, currentPath = "/" }) {
           />
         </div>
         <PushSubscribeButton />
+        <AuthMenu user={user} locale={locale} currentPath={currentPath} />
         <LocaleSwitch
           locale={locale}
           path={currentPath}

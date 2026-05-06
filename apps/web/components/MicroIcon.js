@@ -54,6 +54,14 @@ export default function MicroIcon({ name = "dot", className = "", title = "" }) 
     case "info":
       shape = <><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5.5M12 7.5h.01" /></>;
       break;
+    case "user":
+      shape = (
+        <>
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7" />
+        </>
+      );
+      break;
     case "menu":
       shape = <><circle cx="6" cy="12" r="1.4" fill="currentColor" /><circle cx="12" cy="12" r="1.4" fill="currentColor" /><circle cx="18" cy="12" r="1.4" fill="currentColor" /></>;
       break;

@@ -26,19 +26,21 @@ import { formatPercent, formatProb, riskBadgeTone } from "../../lib/format";
 import { getMessages, localizeRiskClass, localizeSeverity, normalizeLocale } from "../../lib/i18n";
 import { deriveMissionState } from "../../lib/mission";
 import { getTelegramSubscribeUrl } from "../../lib/publicLinks";
+import { getCurrentUser } from "../../lib/supabase/server";
 
 export default async function DashboardPage({ params }) {
   const resolvedParams = await params;
   const locale = normalizeLocale(resolvedParams.lang);
   const messages = getMessages(locale);
 
-  const [latestRun, districtRows, fires, alerts, rules, weather] = await Promise.all([
+  const [latestRun, districtRows, fires, alerts, rules, weather, user] = await Promise.all([
     getLatestRun(),
     getDistrictRiskDaily(),
     getActiveFireDaily(),
     getAlertEvents(),
     getAlertRules(),
-    getWeatherData()
+    getWeatherData(),
+    getCurrentUser()
   ]);
 
   const districts = sortDistrictsForOperations(districtRows, rules).map((district) => ({
@@ -94,6 +96,7 @@ export default async function DashboardPage({ params }) {
           peakProbability={peakProbability}
           runDate={runDate}
           weather={weather}
+          isAuthenticated={!!user}
         />
       </div>
 

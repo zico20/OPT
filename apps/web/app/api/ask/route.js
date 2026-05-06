@@ -19,26 +19,26 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { TOOLS } from "../../../lib/askTools";
+import { getCurrentUser } from "../../../lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const MODEL = "claude-haiku-4-5-20251001";
-const MAX_DAILY_PER_IP = 5;
+// Authenticated users get a higher daily ceiling because they're tied to a
+// stable identity (the Supabase user id) — IP rotation isn't a viable
+// abuse vector for them. Anonymous traffic stays IP-keyed at the lower
+// ceiling and is gated behind sign-in entirely now.
+const MAX_DAILY_PER_USER = 20;
 const MAX_TURNS_PER_SESSION = 5;
 const MAX_TOOL_CALLS_PER_TURN = 5;
 const MAX_OUTPUT_TOKENS = 800;
 
 // In-process daily-counter store. With a single Node process (systemd unit)
 // this is fine; if we ever go multi-instance we'll need a shared KV (Redis).
-const ipCounter = new Map(); // key: ip + ":" + dayKey, value: count
+const userCounter = new Map(); // key: user_id + ":" + dayKey, value: count
 function dayKey(d = new Date()) {
   return d.toISOString().slice(0, 10);
-}
-function ipKeyFor(req) {
-  const fwd = req.headers.get("x-forwarded-for");
-  const real = req.headers.get("x-real-ip");
-  return (fwd?.split(",")[0]?.trim() || real || "unknown").slice(0, 64);
 }
 
 // ──────────────── Tool definitions sent to Claude ────────────────
@@ -172,14 +172,30 @@ function extractAction(text) {
 }
 
 export async function POST(req) {
-  // ─── Rate limit ───
-  const ip = ipKeyFor(req);
-  const k = ip + ":" + dayKey();
-  const used = ipCounter.get(k) || 0;
-  if (used >= MAX_DAILY_PER_IP) {
+  // ─── Auth gate ───
+  // Ask AI is now sign-in-only. Anonymous requests get a 401 the UI uses
+  // to prompt sign-in. Auth is read from the Supabase session cookie that
+  // middleware refreshes on every navigation.
+  const user = await getCurrentUser();
+  if (!user) {
     return NextResponse.json(
       {
-        reply: "You've reached the 5 questions / day limit. Come back tomorrow, or use the HazardSignal Telegram bot for unlimited briefings.",
+        reply: "Please sign in to use Ask AI.",
+        requiresAuth: true
+      },
+      { status: 401 }
+    );
+  }
+
+  // ─── Rate limit ───
+  // 20 questions / user / day. Counter resets at UTC midnight (in-process,
+  // so also on server restart — fine for single-instance deploys).
+  const k = user.id + ":" + dayKey();
+  const used = userCounter.get(k) || 0;
+  if (used >= MAX_DAILY_PER_USER) {
+    return NextResponse.json(
+      {
+        reply: "You've reached your daily Ask AI limit. Come back tomorrow, or use the HazardSignal Telegram bot for unlimited briefings.",
         sessionLimited: true,
         remaining: 0
       },
@@ -274,13 +290,13 @@ export async function POST(req) {
     );
   }
 
-  // ─── Increment IP counter (only on a successful answer) ───
-  ipCounter.set(k, used + 1);
+  // ─── Increment user counter (only on a successful answer) ───
+  userCounter.set(k, used + 1);
 
   const { reply, action } = extractAction(finalText || "");
   return NextResponse.json({
     reply: reply || "I couldn't generate a reply. Please try again.",
     action,
-    remaining: Math.max(0, MAX_DAILY_PER_IP - (used + 1))
+    remaining: Math.max(0, MAX_DAILY_PER_USER - (used + 1))
   });
 }

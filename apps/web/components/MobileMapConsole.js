@@ -65,7 +65,8 @@ export default function MobileMapConsole({
   locale = "en",
   missionState = "monitoring",
   runDate = "-",
-  weather = null
+  weather = null,
+  isAuthenticated = false
 }) {
   const sheetT = pickSheetStrings(locale);
 
@@ -115,7 +116,7 @@ export default function MobileMapConsole({
           locale={locale}
           missionState={missionState}
         />
-        <AskAI locale={locale} />
+        <AskAI locale={locale} isAuthenticated={isAuthenticated} />
       </div>
 
       <MobileBottomSheet peek={peek} above={<MobileWeatherFloats weather={weather} />}>

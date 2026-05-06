@@ -4,6 +4,7 @@ import PublicTopNav from "../../../components/PublicTopNav";
 import { getLatestRun } from "../../../lib/data";
 import { getMessages, normalizeLocale } from "../../../lib/i18n";
 import { getTelegramSubscribeUrl } from "../../../lib/publicLinks";
+import { getCurrentUser } from "../../../lib/supabase/server";
 
 export default async function MorePage({ params }) {
   const resolvedParams = await params;
@@ -11,6 +12,7 @@ export default async function MorePage({ params }) {
   const messages = getMessages(locale);
   const latestRun = await getLatestRun();
   const telegramUrl = getTelegramSubscribeUrl();
+  const user = await getCurrentUser();
 
   const shellClass = ["shell", messages.dir === "rtl" ? "rtl" : ""].filter(Boolean).join(" ");
 
@@ -21,6 +23,7 @@ export default async function MorePage({ params }) {
           locale={locale}
           runDate={latestRun?.run_date || "-"}
           telegramUrl={telegramUrl}
+          user={user ? { email: user.email, id: user.id } : null}
         />
       </div>
 

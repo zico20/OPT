@@ -10,8 +10,11 @@ const MAX_USER_TURNS = 5;
 // kept English everywhere — it's a brand mark for the feature, not body copy.
 const STRINGS = {
   en: {
+    signInRequired: "Sign in to use Ask AI",
+    signInBtn: "Sign in",
+    signInHint: "Get 20 questions/day and save your conversation history.",
     intro: "Ask Me Anything About Wildfire Risk Today ..",
-    sub: "5 Questions / day",
+    sub: "20 Questions / day",
     placeholder: "Ask about a district, fire, or weather…",
     placeholderLimited: "Daily limit reached",
     placeholderSessionFull: "Session full — start over",
@@ -28,8 +31,11 @@ const STRINGS = {
     networkError: "Network error — could not reach the assistant. Check your connection."
   },
   ar: {
+    signInRequired: "سجّل الدخول لاستخدام Ask AI",
+    signInBtn: "تسجيل الدخول",
+    signInHint: "احصل على 20 سؤالاً يومياً واحفظ سجل محادثاتك.",
     intro: "اسألني أي شيء عن مخاطر الحرائق اليوم ..",
-    sub: "5 أسئلة في اليوم",
+    sub: "20 سؤالاً في اليوم",
     placeholder: "اسأل عن منطقة، حريق، أو الطقس…",
     placeholderLimited: "تم بلوغ الحد اليومي",
     placeholderSessionFull: "الجلسة ممتلئة — ابدأ من جديد",
@@ -46,8 +52,11 @@ const STRINGS = {
     networkError: "خطأ في الشبكة — تعذر الوصول إلى المساعد. تحقق من اتصالك."
   },
   tr: {
+    signInRequired: "Ask AI'yı kullanmak için giriş yapın",
+    signInBtn: "Giriş yap",
+    signInHint: "Günlük 20 soru hakkı kazanın ve sohbet geçmişinizi kaydedin.",
     intro: "Bugün Yangın Riski Hakkında Bana Her Şeyi Sor ..",
-    sub: "Günde 5 Soru",
+    sub: "Günde 20 Soru",
     placeholder: "Bir ilçe, yangın veya hava durumu hakkında sor…",
     placeholderLimited: "Günlük limit doldu",
     placeholderSessionFull: "Oturum dolu — yeniden başla",
@@ -78,9 +87,11 @@ function pickLocale(locale) {
   return "en";
 }
 
-export default function AskAI({ locale = "en" }) {
+export default function AskAI({ locale = "en", isAuthenticated = false }) {
   const lang = pickLocale(locale);
   const t = STRINGS[lang];
+  const localePrefix = "/" + lang;
+  const signInHref = `${localePrefix}/signin?next=${encodeURIComponent(`/${lang}`)}`;
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]); // [{ role, content, action? }]
   const [input, setInput] = useState("");
@@ -184,31 +195,41 @@ export default function AskAI({ locale = "en" }) {
           </header>
 
           <div className="m-ask-body" ref={scrollRef}>
-            {messages.length === 0 && (
-              <div className="m-ask-intro">
-                <p className="m-ask-intro-line">{t.intro}</p>
-                <p className="m-ask-intro-sub">{t.sub}</p>
+            {!isAuthenticated ? (
+              <div className="m-ask-signin-gate">
+                <p className="m-ask-intro-line">{t.signInRequired}</p>
+                <p className="m-ask-intro-sub">{t.signInHint}</p>
+                <a href={signInHref} className="m-ask-signin-cta">{t.signInBtn} →</a>
               </div>
-            )}
+            ) : (
+              <>
+                {messages.length === 0 && (
+                  <div className="m-ask-intro">
+                    <p className="m-ask-intro-line">{t.intro}</p>
+                    <p className="m-ask-intro-sub">{t.sub}</p>
+                  </div>
+                )}
 
-            {messages.map((m, i) => (
-              <div key={i} className={`m-ask-msg m-ask-msg-${m.role}`}>
-                <div className="m-ask-msg-bubble">{m.content}</div>
-              </div>
-            ))}
+                {messages.map((m, i) => (
+                  <div key={i} className={`m-ask-msg m-ask-msg-${m.role}`}>
+                    <div className="m-ask-msg-bubble">{m.content}</div>
+                  </div>
+                ))}
 
-            {busy && (
-              <div className="m-ask-msg m-ask-msg-assistant">
-                <div className="m-ask-msg-bubble m-ask-typing">
-                  <span /><span /><span />
-                </div>
-              </div>
+                {busy && (
+                  <div className="m-ask-msg m-ask-msg-assistant">
+                    <div className="m-ask-msg-bubble m-ask-typing">
+                      <span /><span /><span />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
           {/* Suggested questions: hide once the user starts typing, reappear if
               they erase the input. Sits above the input bar. */}
-          {!input.trim() && !busy && !reachedTurnLimit && !limited && (
+          {isAuthenticated && !input.trim() && !busy && !reachedTurnLimit && !limited && (
             <div className="m-ask-suggestions">
               {SUGGESTED.map((s, i) => (
                 <button
@@ -223,6 +244,7 @@ export default function AskAI({ locale = "en" }) {
             </div>
           )}
 
+          {isAuthenticated && (
           <form
             className="m-ask-form"
             onSubmit={(e) => { e.preventDefault(); send(input); }}
@@ -254,6 +276,7 @@ export default function AskAI({ locale = "en" }) {
               </button>
             )}
           </form>
+          )}
 
           <div className="m-ask-footnote">
             {remaining !== null && !limited && (
