@@ -120,20 +120,8 @@ export default function AskAI() {
           <div className="m-ask-body" ref={scrollRef}>
             {messages.length === 0 && (
               <div className="m-ask-intro">
-                <p className="m-ask-intro-line">Ask anything about Antalya's wildfire risk today.</p>
-                <p className="m-ask-intro-sub">5 questions / day · auto-detects your language</p>
-                <div className="m-ask-suggestions">
-                  {SUGGESTED.map((s, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      className="m-ask-suggestion"
-                      onClick={() => pickSuggestion(s)}
-                    >
-                      {s.en}
-                    </button>
-                  ))}
-                </div>
+                <p className="m-ask-intro-line">Ask Me Anything About Wildfire Risk Today ..</p>
+                <p className="m-ask-intro-sub">5 Questions / day</p>
               </div>
             )}
 
@@ -162,6 +150,23 @@ export default function AskAI() {
             )}
           </div>
 
+          {/* Suggested questions: hide once the user starts typing, reappear if
+              they erase the input. Sits above the input bar. */}
+          {!input.trim() && !busy && !reachedTurnLimit && !limited && (
+            <div className="m-ask-suggestions">
+              {SUGGESTED.map((s, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className="m-ask-suggestion"
+                  onClick={() => pickSuggestion(s)}
+                >
+                  {s.en}
+                </button>
+              ))}
+            </div>
+          )}
+
           <form
             className="m-ask-form"
             onSubmit={(e) => { e.preventDefault(); send(input); }}
@@ -179,14 +184,19 @@ export default function AskAI() {
               disabled={busy || reachedTurnLimit || limited}
               maxLength={400}
             />
-            <button
-              type="submit"
-              className="m-ask-send"
-              disabled={busy || !input.trim() || reachedTurnLimit || limited}
-              aria-label="Send"
-            >
-              {busy ? "…" : "↑"}
-            </button>
+            {/* Send button only renders when there's text to send (or while
+                the request is in flight, to show the spinner). Keeps the input
+                bar clean when empty. */}
+            {(input.trim() || busy) && (
+              <button
+                type="submit"
+                className="m-ask-send"
+                disabled={busy || !input.trim() || reachedTurnLimit || limited}
+                aria-label="Send"
+              >
+                {busy ? "…" : "↑"}
+              </button>
+            )}
           </form>
 
           <div className="m-ask-footnote">
