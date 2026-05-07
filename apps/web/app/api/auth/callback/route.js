@@ -45,9 +45,15 @@ export async function GET(request) {
         return cookieStore.getAll();
       },
       setAll(cookiesToSet) {
-        console.log("[auth/callback] setAll cookies:", cookiesToSet.map(c => c.name).join(", "));
         for (const { name, value, options } of cookiesToSet) {
-          response.cookies.set(name, value, options);
+          // Log raw options once so we can see what supabase is asking for.
+          console.log("[auth/callback] set cookie:", name, "opts:", JSON.stringify(options));
+          // Strip Domain so the cookie is host-only on hazardsignal.com.
+          // (If supabase ever passes domain: '.supabase.co' or similar, the
+          //  browser would reject it for our origin.)
+          const safeOpts = { ...options };
+          delete safeOpts.domain;
+          response.cookies.set(name, value, safeOpts);
         }
       }
     }
