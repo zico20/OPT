@@ -7502,6 +7502,42 @@ html.dv3-light .dv3-main::after {
   border-radius: var(--dv3-radius-lg);
   overflow: hidden;
 }
+
+/* Date-grouped sections on the alerts page */
+.dv3-alerts-group { margin-bottom: 24px; }
+.dv3-alerts-group:last-child { margin-bottom: 0; }
+.dv3-alerts-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 10px;
+  padding-left: 14px;
+  position: relative;
+}
+.dv3-alerts-group-head::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 4px;
+  height: calc(100% - 6px);
+  background: var(--dv3-accent);
+  border-radius: 2px;
+}
+.dv3-alerts-group-head h3 {
+  font-family: var(--dv3-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--dv3-ink);
+}
+.dv3-alerts-group-head > span {
+  color: var(--dv3-muted);
+  font-size: 0.74rem;
+  font-family: var(--dv3-font-mono);
+}
 .dv3-alerts-table {
   width: 100%;
   border-collapse: collapse;
