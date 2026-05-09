@@ -6,25 +6,25 @@ export default function manifest() {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#FBF8F3",
-    theme_color: "#FBF8F3",
+    background_color: "#050505",
+    theme_color: "#050505",
     icons: [
+      // Brand radar logo as SVG — scales to any DPI, single source of truth.
+      // The PNGs in /public are the legacy curved logo; left in place but no
+      // longer referenced from the manifest. Modern browsers (incl. iOS 16+)
+      // accept SVG icons in PWA manifests; older Safari falls back to the
+      // <link rel="apple-touch-icon"> Next.js auto-generates from
+      // /app/apple-icon.svg.
       {
-        src: "/icon-192.png",
-        sizes: "192x192",
-        type: "image/png",
+        src: "/icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
         purpose: "any"
       },
       {
-        src: "/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "any"
-      },
-      {
-        src: "/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
+        src: "/apple-icon.svg",
+        sizes: "any",
+        type: "image/svg+xml",
         purpose: "maskable"
       }
     ]
