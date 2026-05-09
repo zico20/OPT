@@ -23,6 +23,8 @@ export default async function MethodologyPage({ params }) {
           locale={locale}
           messages={messages}
           runDate={latestRun?.run_date || "-"}
+          latestRun={latestRun}
+          rules={rules}
         />
       </div>
 

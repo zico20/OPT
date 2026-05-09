@@ -1,6 +1,6 @@
 "use client";
 
-import RiskMapShell from "./RiskMapShell";
+import MobileLiveMapV3 from "./MobileLiveMapV3";
 import MobileTopBar from "./MobileTopBar";
 import MobileBottomSheet from "./MobileBottomSheet";
 import MobileWeatherFloats from "./MobileWeatherFloats";
@@ -12,8 +12,8 @@ import { localizeRiskClass } from "../lib/i18n";
 // already localized via lib/i18n's localizeRiskClass; this dict covers the
 // other UI bits (header + metric label).
 const SHEET_STRINGS = {
-  en: { topN: "Top 5 districts", maxLabel: "Max %", hotspot: (n) => `· ${n} hotspot${n === 1 ? "" : "s"}` },
-  tr: { topN: "İlk 5 ilçe", maxLabel: "Maks %", hotspot: (n) => `· ${n} sıcak nokta` }
+  en: { topN: "All districts", maxLabel: "Max %", hotspot: (n) => `· ${n} hotspot${n === 1 ? "" : "s"}` },
+  tr: { topN: "Tüm ilçeler", maxLabel: "Maks %", hotspot: (n) => `· ${n} sıcak nokta` }
 };
 
 function pickSheetStrings(locale) {
@@ -23,23 +23,24 @@ function pickSheetStrings(locale) {
 }
 
 function colorFromClass(key) {
+  // Mirrors desktop V3 risk gradient (blue → red).
   switch (key) {
-    case "very-low": return "#4575b4";
-    case "low": return "#91bfdb";
-    case "medium": return "#ffffbf";
-    case "high": return "#fdae61";
-    case "very-high": return "#d73027";
-    case "fire": return "#ff3131";
-    default: return "#4575b4";
+    case "very-low": return "#2563d8";
+    case "low": return "#4d9bd6";
+    case "medium": return "#b8d96b";
+    case "high": return "#f59e0b";
+    case "very-high": return "#ef4444";
+    case "fire": return "#ef4444";
+    default: return "#2563d8";
   }
 }
 
-// Rank tile colors, descending intensity: red → orange → amber → light → slate
+// Rank tile colors, descending intensity: red → orange → amber → light → slate.
 const RANK_COLORS = ["#ef4444", "#ff8a3d", "#fbbf24", "#fde68a", "#94a3b8"];
 
 // Ranks with light tile backgrounds need dark text for contrast.
 function rankTextColor(index) {
-  return index === 2 || index === 3 ? "#0a0509" : "#fff";
+  return index === 2 || index === 3 ? "#0a0a0c" : "#fff";
 }
 
 // Map a textual risk class ("Very High") to our color key ("very-high")
@@ -68,26 +69,35 @@ export default function MobileMapConsole({
 }) {
   const sheetT = pickSheetStrings(locale);
 
-  // Mobile shows "Max %" as the headline metric, so order Top N by it directly
-  // (the desktop leaderboard keeps the operational-priority sort because it
-  // has explicit columns for each metric).
-  const topN = [...districts]
-    .sort((a, b) => Number(b.max_fire_prob ?? 0) - Number(a.max_fire_prob ?? 0))
-    .slice(0, 5);
-  const lead = topN[0] || null;
+  // Sort all districts descending by max_fire_prob — the bottom sheet shows
+  // the entire leaderboard now (was Top 5 — superseded by user request to
+  // expose every district inline rather than via a separate route).
+  const ranked = [...districts]
+    .sort((a, b) => Number(b.max_fire_prob ?? 0) - Number(a.max_fire_prob ?? 0));
+  const lead = ranked[0] || null;
   const leadPeakClass = classFromMaxProb(lead?.max_fire_prob);
   const leadClassKey = classKey(leadPeakClass);
   const leadColor = colorFromClass(leadClassKey);
   const severityKey = (lead?.operational_severity || missionState || "monitoring").toLowerCase();
   const peakDisplay = fmtMaxProb(lead?.max_fire_prob);
 
+  // Match the V3 desktop focus headline: risk class · X.X% high-risk area · N hotspots
+  // (each piece separated by a middot via the `.m-live-sub` CSS).
+  const homeMsg = messages?.home || {};
+  const areaLabel = homeMsg.highArea || "high-risk area";
+  const hotspotsLabel = homeMsg.hotspots || "hotspots";
   const peek = (
     <div className="m-live-headline">
       <div className="m-live-district">
         <strong className="m-live-name">{lead?.district_name || "—"}</strong>
         <span className="m-live-sub">
-          {lead ? localizeRiskClass(leadPeakClass, locale) : "—"}
-          {lead?.hotspot_count_24h > 0 ? ` ${sheetT.hotspot(lead.hotspot_count_24h)}` : ""}
+          <span>{lead ? localizeRiskClass(leadPeakClass, locale) : "—"}</span>
+          {lead?.high_or_very_high_area_pct != null && (
+            <span>{Number(lead.high_or_very_high_area_pct).toFixed(1)}% {areaLabel}</span>
+          )}
+          {lead?.hotspot_count_24h != null && (
+            <span>{lead.hotspot_count_24h} {hotspotsLabel}</span>
+          )}
         </span>
       </div>
       <div className="m-live-badge" style={{ backgroundColor: leadColor }} data-class={leadClassKey}>
@@ -107,24 +117,35 @@ export default function MobileMapConsole({
       />
 
       <div className="m-live-map">
-        <RiskMapShell
+        <MobileLiveMapV3
           districts={districts}
           fires={fires}
-          messages={messages?.map || messages}
           locale={locale}
-          missionState={missionState}
         />
         <AskAI locale={locale} />
       </div>
 
-      <MobileBottomSheet peek={peek} above={<MobileWeatherFloats weather={weather} />}>
+      <MobileBottomSheet
+        peek={peek}
+        above={<MobileWeatherFloats weather={weather} />}
+        listHeader={(
+          <h3 className="m-sheet-list-title">
+            {sheetT.topN}
+            <span className="m-sheet-list-count">{ranked.length}</span>
+          </h3>
+        )}
+      >
         <div className="m-sheet-list">
-          <h3 className="m-sheet-list-title">{sheetT.topN}</h3>
-          {topN.map((d, i) => {
-            const rankColor = RANK_COLORS[i] || RANK_COLORS[RANK_COLORS.length - 1];
+          {ranked.map((d, i) => {
+            // Top 5 keep the brand-tinted rank tile; rest fall to a neutral
+            // dark/light surface so the eye registers them as the long tail.
+            const rankColor = i < RANK_COLORS.length ? RANK_COLORS[i] : null;
             return (
               <div className="m-sheet-item" key={d.district_id || i} data-rank={i + 1}>
-                <div className="m-sheet-item-rank" style={{ backgroundColor: rankColor, color: rankTextColor(i) }}>
+                <div
+                  className="m-sheet-item-rank"
+                  style={rankColor ? { backgroundColor: rankColor, color: rankTextColor(i) } : undefined}
+                >
                   {i + 1}
                 </div>
                 <div className="m-sheet-item-body">

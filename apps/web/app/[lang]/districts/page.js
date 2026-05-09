@@ -1,6 +1,6 @@
 import DesktopShellV3 from "../../../components/DesktopShellV3";
 import DesktopDistrictsV3 from "../../../components/DesktopDistrictsV3";
-import MobileMapConsole from "../../../components/MobileMapConsole";
+import MobileDistrictsContent from "../../../components/MobileDistrictsContent";
 import {
   getActiveFireDaily,
   getAlertEvents,
@@ -43,17 +43,11 @@ export default async function DistrictsListPage({ params }) {
   return (
     <div className="shell" suppressHydrationWarning>
       <div className="m-route-mobile-only">
-        <MobileMapConsole
-          districts={districts}
-          fires={fires}
-          messages={messages}
+        <MobileDistrictsContent
           locale={locale}
-          missionState={missionState}
-          criticalDistricts={criticalDistricts}
-          activeFireDistricts={activeFireDistricts}
-          peakProbability={peakProbability}
+          messages={messages}
+          districts={districts}
           runDate={runDate}
-          weather={weather}
         />
       </div>
 

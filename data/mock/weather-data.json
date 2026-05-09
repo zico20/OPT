@@ -1,0 +1,20 @@
+{
+  "fetched_at": "2026-05-02T20:54:55.603Z",
+  "run_date": "2026-05-02",
+  "current": {
+    "temp_c": 16,
+    "humidity_pct": 88,
+    "wind_speed_kmh": 7.2,
+    "wind_direction": "NW",
+    "description": "Partly cloudy",
+    "icon": "02d"
+  },
+  "tomorrow": {
+    "date": "2026-05-03",
+    "temp_max_c": 17.7,
+    "humidity_min_pct": 51,
+    "wind_max_kmh": 24.1,
+    "description": "Thunderstorm",
+    "risk_modifier": 1.15
+  }
+}

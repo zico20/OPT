@@ -1,5 +1,5 @@
-import Link from "next/link";
 import MobileTopBar from "./MobileTopBar";
+import MobileBgParticles from "./MobileBgParticles";
 
 const COPY = {
   en: {
@@ -43,19 +43,28 @@ export default function MobileAboutContent({ locale = "en", runDate = "-", stats
 
   return (
     <div className="m-about">
+      <MobileBgParticles />
       <MobileTopBar tab="about" locale={locale} runDate={runDate} showScale={false} />
 
       <div className="m-about-scroll">
         <section className="m-about-hero">
           <div className="m-about-mark" aria-hidden="true">
-            <svg viewBox="0 0 512 512" width="64" height="64">
-              <path d="M150 220C150 140 210 100 256 100C302 100 362 140 362 220" stroke="#FF5F1F" strokeWidth="35" strokeLinecap="round" fill="none"/>
-              <path d="M190 270C190 230 225 210 256 210C287 210 322 230 322 270V310C322 350 287 380 256 380C225 380 190 350 190 310" stroke="#FF5F1F" strokeWidth="30" strokeLinecap="round" fill="none"/>
-              <path d="M256 270L280 320C280 320 256 345 256 345C256 345 232 320 232 320L256 270Z" fill="#FF3131"/>
+            <svg viewBox="0 0 64 64" width="72" height="72">
+              <defs>
+                <linearGradient id="hs-arc-mabout" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#ff5a1f" />
+                  <stop offset="100%" stopColor="#ff8a3d" />
+                </linearGradient>
+              </defs>
+              <path d="M 8 42 A 24 24 0 0 1 56 42" fill="none" stroke="url(#hs-arc-mabout)" strokeWidth="3.2" strokeLinecap="round" opacity="0.95" />
+              <path d="M 16 42 A 16 16 0 0 1 48 42" fill="none" stroke="url(#hs-arc-mabout)" strokeWidth="3.2" strokeLinecap="round" opacity="0.6" />
+              <path d="M 23 42 A 9 9 0 0 1 41 42" fill="none" stroke="url(#hs-arc-mabout)" strokeWidth="3.2" strokeLinecap="round" opacity="0.3" />
+              <circle cx="32" cy="42" r="3.4" fill="#ff8a3d" />
+              <circle cx="32" cy="42" r="1.6" fill="#ffffff" opacity="0.95" />
             </svg>
           </div>
           <span className="m-about-eyebrow">{c.eyebrow}</span>
-          <h1 className="m-about-title">{c.title}</h1>
+          <h1 className="m-about-title">Hazard<span className="m-about-title-accent">Signal</span></h1>
           <p className="m-about-tagline">{c.tagline}</p>
         </section>
 
@@ -90,10 +99,6 @@ export default function MobileAboutContent({ locale = "en", runDate = "-", stats
           <h3 className="m-about-card-title">{c.sources}</h3>
           <p>{c.sourcesBody}</p>
         </section>
-
-        <Link className="m-about-cta" href={"/" + locale + "/methodology"}>
-          {c.methodCta} →
-        </Link>
 
         <section className="m-about-card m-about-credits">
           <h3 className="m-about-card-title">{c.creditsTitle}</h3>

@@ -6,12 +6,12 @@ const PEEK_HEIGHT = 108;
 const EXPANDED_RATIO = 0.7;
 const SNAP_THRESHOLD = 60; // px the user must drag past to snap
 
-export default function MobileBottomSheet({ peek, children, above = null }) {
+export default function MobileBottomSheet({ peek, children, listHeader = null, above = null }) {
   const [vh, setVh] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [dragDy, setDragDy] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const shellRef = useRef(null);
+  const dragZoneRef = useRef(null);
   const startY = useRef(0);
   const startExpanded = useRef(false);
   const draggingRef = useRef(false);
@@ -25,10 +25,12 @@ export default function MobileBottomSheet({ peek, children, above = null }) {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Attach native touch listeners with passive: false so we can preventDefault
-  // and block the browser's pull-to-refresh / page scroll during drag.
+  // Touch listeners are bound only to the drag zone (handle + peek + optional
+  // listHeader) — never the scrollable list area below. Without this split,
+  // the user can't scroll a long list inside the sheet because every touch
+  // there would be intercepted as a sheet-resize drag.
   useEffect(() => {
-    const node = shellRef.current;
+    const node = dragZoneRef.current;
     if (!node) return undefined;
 
     function handleStart(e) {
@@ -85,9 +87,6 @@ export default function MobileBottomSheet({ peek, children, above = null }) {
   if (height < PEEK_HEIGHT) height = PEEK_HEIGHT;
   if (height > expandedHeight) height = expandedHeight;
 
-  // The sheet is anchored at bottom: 92px (above the bottom nav). The "above"
-  // slot floats just over the sheet's top edge, so its bottom from the viewport
-  // is the sheet's bottom (92px) + the sheet's current height + a small gap.
   const aboveBottom = 92 + height + 8;
 
   return (
@@ -102,19 +101,21 @@ export default function MobileBottomSheet({ peek, children, above = null }) {
         </div>
       )}
       <div
-        ref={shellRef}
         className={["m-sheet-shell", expanded ? "expanded" : "peek", dragging ? "dragging" : ""].filter(Boolean).join(" ")}
         style={{ height: height + "px" }}
         role="dialog"
         aria-label="Top districts"
       >
-        <div className="m-sheet-handle-area">
-          <div className="m-sheet-handle" aria-hidden="true" />
-        </div>
-        <div className="m-sheet-body">
+        <div ref={dragZoneRef} className="m-sheet-drag-zone">
+          <div className="m-sheet-handle-area">
+            <div className="m-sheet-handle" aria-hidden="true" />
+          </div>
           <div className="m-sheet-peek">{peek}</div>
-          <div className="m-sheet-rest">{children}</div>
+          {listHeader && expanded && (
+            <div className="m-sheet-list-header">{listHeader}</div>
+          )}
         </div>
+        <div className="m-sheet-rest">{children}</div>
       </div>
     </>
   );

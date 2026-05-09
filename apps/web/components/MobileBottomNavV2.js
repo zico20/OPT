@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import MicroIcon from "./MicroIcon";
 
 const LABELS = {
-  en: { live: "Live", about: "About", more: "More" },
-  tr: { live: "Canlı", about: "Hakkında", more: "Daha" }
+  en: { live: "Live", alerts: "Alerts", more: "More" },
+  tr: { live: "Canlı", alerts: "Uyarılar", more: "Daha" }
 };
 
 const TABS = [
-  { key: "about", icon: "info" },
+  { key: "alerts", icon: "bell" },
   { key: "live", icon: "radar", primary: true },
   { key: "more", icon: "menu" }
 ];
@@ -23,7 +23,7 @@ function deriveSlug(pathname, locale) {
 
 function activeTab(slug) {
   if (slug === "" || slug === "map") return "live";
-  if (slug === "about") return "about";
+  if (slug === "alerts") return "alerts";
   if (slug === "more") return "more";
   return null;
 }
@@ -31,7 +31,7 @@ function activeTab(slug) {
 function tabHref(key, locale) {
   switch (key) {
     case "live": return "/" + locale;
-    case "about": return "/" + locale + "/about";
+    case "alerts": return "/" + locale + "/alerts";
     case "more": return "/" + locale + "/more";
     default: return "/" + locale;
   }

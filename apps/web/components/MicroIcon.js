@@ -69,6 +69,21 @@ export default function MicroIcon({ name = "dot", className = "", title = "" }) 
     case "external":
       shape = <><path d="M14 4.5h5.5V10" /><path d="M19.5 4.5 11 13" /><path d="M19.5 14v3a2.5 2.5 0 0 1-2.5 2.5H7A2.5 2.5 0 0 1 4.5 17V7A2.5 2.5 0 0 1 7 4.5h3" /></>;
       break;
+    case "satellite":
+      // Symmetric satellite: central body + two solar panels + antenna with
+      // a small dish on top. Matches the line-art weight of the rest of the
+      // icon set (1.9 stroke, no fill).
+      shape = (
+        <>
+          <rect x="3.5" y="9.5" width="4" height="5" rx="0.6" />
+          <rect x="9.5" y="9" width="5" height="6" rx="0.8" />
+          <rect x="16.5" y="9.5" width="4" height="5" rx="0.6" />
+          <path d="M7.5 12h2M14.5 12h2" />
+          <path d="M12 9V6.5" />
+          <circle cx="12" cy="5" r="1.2" />
+        </>
+      );
+      break;
     default:
       break;
   }

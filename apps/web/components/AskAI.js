@@ -60,7 +60,7 @@ function pickLocale(locale) {
   return "en";
 }
 
-export default function AskAI({ locale = "en" }) {
+export default function AskAI({ locale = "en", closeOnOutsideClick = false }) {
   const lang = pickLocale(locale);
   const t = STRINGS[lang];
   const [open, setOpen] = useState(false);
@@ -70,6 +70,26 @@ export default function AskAI({ locale = "en" }) {
   const [remaining, setRemaining] = useState(null);
   const [limited, setLimited] = useState(false);
   const scrollRef = useRef(null);
+  const panelRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  // Desktop variant: close the panel when the user clicks anywhere outside
+  // the panel + the trigger button. Mobile keeps the legacy behavior (close
+  // only via the ✕ button) since the panel covers the full map area there.
+  useEffect(() => {
+    if (!closeOnOutsideClick || !open) return undefined;
+    function handleDown(e) {
+      const inPanel = panelRef.current && panelRef.current.contains(e.target);
+      const inButton = buttonRef.current && buttonRef.current.contains(e.target);
+      if (!inPanel && !inButton) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleDown);
+    document.addEventListener("touchstart", handleDown);
+    return () => {
+      document.removeEventListener("mousedown", handleDown);
+      document.removeEventListener("touchstart", handleDown);
+    };
+  }, [closeOnOutsideClick, open]);
 
   const userTurns = messages.filter((m) => m.role === "user").length;
   const reachedTurnLimit = userTurns >= MAX_USER_TURNS;
@@ -141,6 +161,7 @@ export default function AskAI({ locale = "en" }) {
   return (
     <>
       <button
+        ref={buttonRef}
         type="button"
         className={["m-ask-btn", open ? "open" : ""].filter(Boolean).join(" ")}
         onClick={() => setOpen((v) => !v)}
@@ -151,7 +172,7 @@ export default function AskAI({ locale = "en" }) {
       </button>
 
       {open && (
-        <div className="m-ask-panel" role="dialog" aria-label={t.panelAriaLabel}>
+        <div ref={panelRef} className="m-ask-panel" role="dialog" aria-label={t.panelAriaLabel}>
           <header className="m-ask-header">
             <div className="m-ask-title">
               <span className="m-ask-title-icon" aria-hidden="true">✦</span>

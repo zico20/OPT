@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import AskAI from "./AskAI";
 
 // Leaflet uses window — load only on the client.
 const DesktopLiveMapV3 = dynamic(() => import("./DesktopLiveMapV3"), {
@@ -18,10 +19,15 @@ function tierOf(p) {
   if (p >= 0.2) return "low";
   return "vlow";
 }
+// Match the 5-tier risk gradient used by the dots / legend so the focus
+// badge color always matches the dot color of the same district.
 function focusTier(p) {
-  if (p >= 0.85) return "critical";
-  if (p >= 0.7) return "warning";
-  return "watch";
+  if (p == null) return "vlow";
+  if (p >= 0.85) return "vhigh";
+  if (p >= 0.6) return "high";
+  if (p >= 0.4) return "med";
+  if (p >= 0.2) return "low";
+  return "vlow";
 }
 // Derive risk-class label from max_fire_prob. Supabase rows sometimes
 // have stale or null `dominant_risk_class`; deriving keeps the UI
@@ -115,7 +121,10 @@ export default function DesktopHomeV3({
     () => [...districts].sort((a, b) => (b.max_fire_prob ?? 0) - (a.max_fire_prob ?? 0)),
     [districts]
   );
-  // Focus is opt-in: nothing selected until the user clicks a district.
+  // Focus defaults to the highest-risk district so the focus sheet is always
+  // visible. Clicking a different dot updates focus; clicking empty map area
+  // (handled inside DesktopLiveMapV3) resets to null, which we coalesce back
+  // to the top district below — never letting the sheet disappear.
   const [focusId, setFocusId] = useState(null);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -132,7 +141,10 @@ export default function DesktopHomeV3({
     return arr;
   }, [sorted, filter, search]);
 
-  const focus = focusId ? visibleDistricts.find((d) => d.district_id === focusId) : null;
+  const focus =
+    (focusId && visibleDistricts.find((d) => d.district_id === focusId)) ||
+    visibleDistricts[0] ||
+    null;
 
   const weatherTemp = weather?.current?.temp_c;
   const weatherHum = weather?.current?.humidity_pct;
@@ -212,6 +224,11 @@ export default function DesktopHomeV3({
             </div>
           </div>
         )}
+
+        {/* Ask AI — floating pill above the always-visible focus sheet; opens
+            a 420px panel anchored at the same spot. Desktop variant closes
+            on outside click (mobile keeps ✕-only since its panel is full-bleed). */}
+        <AskAI locale={locale} closeOnOutsideClick />
       </div>
 
       {/* RIGHT RAIL — search + filters + layers + legend */}

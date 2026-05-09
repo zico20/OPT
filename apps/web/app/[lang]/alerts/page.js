@@ -1,5 +1,6 @@
 import DesktopShellV3 from "../../../components/DesktopShellV3";
 import DesktopAlertsV3 from "../../../components/DesktopAlertsV3";
+import MobileAlertsContent from "../../../components/MobileAlertsContent";
 import { getAlertEvents, getLatestRun } from "../../../lib/data";
 import { getMessages, normalizeLocale } from "../../../lib/i18n";
 import { getTelegramSubscribeUrl } from "../../../lib/publicLinks";
@@ -18,6 +19,15 @@ export default async function AlertsPage({ params }) {
 
   return (
     <div className="shell" suppressHydrationWarning>
+      <div className="m-route-mobile-only">
+        <MobileAlertsContent
+          locale={locale}
+          messages={messages}
+          alerts={rows}
+          runDate={latestRun?.run_date || "-"}
+        />
+      </div>
+
       <div className="m-route-desktop-only">
         <DesktopShellV3
           telegramUrl={getTelegramSubscribeUrl()}
