@@ -7,7 +7,8 @@
                     "run:daily":  "node src/runDaily.js",
                     "run:weather":  "node src/runWeather.js",
                     "test":  "node --test src/alertRules.test.js",
-                    "run:export":  "node src/exportDailyAssets.js"
+                    "run:export":  "node src/exportDailyAssets.js",
+                    "run:telegram-poller":  "node src/telegramPoller.js"
                 },
     "dependencies":  {
                          "@supabase/supabase-js":  "^2.49.8",

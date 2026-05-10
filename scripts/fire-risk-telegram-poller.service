@@ -1,0 +1,22 @@
+[Unit]
+Description=Fire Risk Telegram Long-Poller
+Documentation=Subscribes Telegram users via long-polling because the VPS provider drops inbound connections from Telegram IP ranges.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/fire-risk/current
+EnvironmentFile=-/opt/fire-risk/current/.env
+ExecStart=/usr/bin/npm --prefix services/worker run run:telegram-poller
+Restart=always
+RestartSec=5
+# Long-polls hold open ~30s; allow plenty of time for graceful shutdown.
+TimeoutStopSec=40
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fire-risk-telegram-poller
+
+[Install]
+WantedBy=multi-user.target
