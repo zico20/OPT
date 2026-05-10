@@ -2,7 +2,6 @@
 import InstallAppHint from "../../components/InstallAppHint";
 import MobileBottomNavV2 from "../../components/MobileBottomNavV2";
 import ParticleCanvas from "../../components/ParticleCanvas";
-import SoftRevealController from "../../components/SoftRevealController";
 import SplashScreen from "../../components/SplashScreen";
 import { getMessages, normalizeLocale } from "../../lib/i18n";
 
@@ -25,7 +24,6 @@ export default async function LocaleLayout({ children, params }) {
     <div className="locale-root" lang={safeLocale} data-locale={safeLocale} suppressHydrationWarning>
       <SplashScreen />
       <ParticleCanvas />
-      <SoftRevealController />
       {children}
       <InstallAppHint messages={messages} />
       <MobileBottomNavV2 locale={safeLocale} />

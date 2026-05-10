@@ -2374,19 +2374,6 @@ form,
 
 
 
-/* ─── SCROLL REVEAL ANIMATIONS ──────────────────────────────────────── */
-
-.soft-reveal-ready [data-soft-reveal] {
-  opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.soft-reveal-ready [data-soft-reveal].is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
 /* ─── PARTICLE CANVAS ────────────────────────────────────────────────── */
 
 .particle-canvas {
