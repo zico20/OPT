@@ -4123,10 +4123,13 @@ form,
     min-height: 100vh;
   }
   .m-method-page-scroll {
-    padding-bottom: 40px;
+    padding-bottom: 0;
   }
+  /* Tight bottom padding — the Sources line should sit just above the bottom
+     nav, not float in 100+px of empty whitespace. The shell already provides
+     ~96px clearance for the bottom nav (env safe-area inset included). */
   .m-method-page .dv3-page-pad {
-    padding: 18px 16px 60px !important;
+    padding: 18px 16px 12px !important;
   }
   .m-method-page .dv3-method-h1 {
     font-size: 1.6rem !important;
