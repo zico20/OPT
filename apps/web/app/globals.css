@@ -4099,6 +4099,14 @@ form,
     z-index: 0;
     pointer-events: none;
     opacity: 0.85;
+    /* iOS Safari leaves "trails" (the particles smear) when a fixed canvas
+       is composited during inertia scroll because the layer is cached
+       while rAF keeps drawing. Forcing the canvas into its own GPU layer
+       lets the OS repaint it live instead of replaying a stale snapshot. */
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
   }
   html.dv3-light .m-bg-particles { opacity: 0.45; }
 
