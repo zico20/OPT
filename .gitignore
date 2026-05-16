@@ -11,3 +11,15 @@ data/runtime-cache/
 secrets/
 wildfire-540-c57338eb025e.json
 tmp_test.txt
+
+# Generated artifacts — regenerated on every build/run, never source.
+# Tracking them caused a `git checkout`/`pull` conflict on every VPS
+# deploy (prebuild rewrites the icons, the weather pipeline rewrites
+# weather-data.json), aborting the deploy.
+apps/web/public/favicon-16x16.png
+apps/web/public/favicon-32x32.png
+apps/web/public/apple-touch-icon.png
+apps/web/public/icon-192.png
+apps/web/public/icon-512.png
+data/mock/weather-data.json
+data/state/
